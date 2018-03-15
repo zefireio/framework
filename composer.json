@@ -1,0 +1,33 @@
+{
+    "name": "zefireio/framework",
+    "description": "Zefire Php Framework",
+    "keywords": ["framework", "zefire"],
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Zefire",
+            "email": "zefireframework@gmail.com"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "src/Zefire/Helpers/helpers.php"
+        ],
+        "psr-4": {
+            "Zefire\\": "src/Zefire"
+        }
+    },
+    "require": {
+        "pda/pheanstalk": "~3.0.2",
+        "symfony/var-dumper": "~3.2",
+        "vlucas/phpdotenv": "~2.2"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
