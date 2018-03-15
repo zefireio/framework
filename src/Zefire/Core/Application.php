@@ -256,7 +256,7 @@ class Application
      */
     public function zefirePath()
     {    
-        return $this->vendorPath() . 'zefire' . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR .  'src' . DIRECTORY_SEPARATOR . 'Zefire' . DIRECTORY_SEPARATOR;
+        return $this->vendorPath() . 'zefireio' . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR .  'src' . DIRECTORY_SEPARATOR . 'Zefire' . DIRECTORY_SEPARATOR;
     }
     /**
      * Returns the config folder path.
