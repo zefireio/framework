@@ -19,7 +19,7 @@ Zefire was designed to be fairly light yet powerful enough to provide tools need
 
 ## Learning Zefire
 
-As this framework is very new, only an api based documentation is available. However, various options are being explored in order to provide the best help possible and hopefully, a more comprehensive documentation should soon be accessbile.
+Please visit Zefire's website for full [documentation](http://zefire.io/documentation) with examples and full [API documentation](http://zefire.io/api-documentation).
 
 ## Contributing
 
