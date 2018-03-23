@@ -68,13 +68,13 @@ class View
      * Renders a compiled view to the browser.
      *
      * @param  string $template
-     * @param  array  $data
+     * @param  mixed  $data
      * @return string
      */
-	public function render($template, $data = [])
+	public function render($template, $data = false)
 	{
 		$this->data = $data;
-		$this->getTemplate($template);
+          $this->getTemplate($template);
 		$this->generateId();
 		if (\App::config('view.force_compile') === true) {
 			$this->compiled = $this->compiler->make($this->template, $data);

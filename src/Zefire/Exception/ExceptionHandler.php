@@ -150,13 +150,13 @@ class ExceptionHandler implements Throwable
     		$response->send();
 		} else {
 			$code = (in_array($exception->getCode(), self::$nonValidHttpCodes)) ? 500 : $exception->getCode();
-			$data = new \stdClass();
-			$data->code = $code;
-			$data->status = \App::config('http.' . $code);
-			$data->message = $exception->getMessage();
-			$data->file = $exception->getFile();
-			$data->line = $exception->getLine();
-			$data->trace = $exception->getTrace();
+			$data = [];
+			$data['code'] = $code;
+			$data['status'] = \App::config('http.' . $code);
+			$data['message'] = $exception->getMessage();
+			$data['file'] = $exception->getFile();
+			$data['line'] = $exception->getLine();
+			$data['trace'] = $exception->getTrace();
 			$response = new HttpResponse($code, \View::render('errors.error', $data));
 			$response->send();			
 		}

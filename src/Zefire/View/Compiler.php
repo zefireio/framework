@@ -38,7 +38,7 @@ class Compiler
 		'endWhileLoop' 		=> '#@endwhile#',
 		'comment' 			=> '#{{-- (.*?) --}}#',
 		'var' 				=> '#{{ (.*?) }}#',
-		'unescapedVar' 		=> '#{!! (.*?) !!}#',
+		'escapedVar' 		=> '#{!! (.*?) !!}#',
 		'startIfStatement' 	=> '#@if(.*)#',
 		'elseStatement' 	=> '#@else#',
 		'elseIfStatement' 	=> '#@elseif\((.*?)\)#',
@@ -65,7 +65,7 @@ class Compiler
 		$html = $this->startRawPhp($html);
 		$html = $this->endRawPhp($html);
 		$html = $this->var($html);
-		$html = $this->unescapedVar($html);
+		$html = $this->escapedVar($html);
 		$html = $this->startIfStatement($html);
 		$html = $this->elseStatement($html);
 		$html = $this->elseIfStatement($html);
@@ -301,21 +301,21 @@ class Compiler
 	{
 		preg_match_all($this->patterns['var'], $html, $matches);
 		foreach ($matches[0] as $key => $value) {
-			$html = str_replace($value, '<?php echo ' . htmlspecialchars($matches[1][$key]) . '; ?>', $html);
+			$html = str_replace($value, '<?php echo ' . $matches[1][$key] . '; ?>', $html);
 		}
 		return $html;
 	}
 	/**
-     * Evaluates unescaped PHP variables.
+     * Evaluates escaped PHP variables.
      *
      * @param  string $html
      * @return string
      */
-	protected function unescapedVar($html)
+	protected function escapedVar($html)
 	{
-		preg_match_all($this->patterns['unescapedVar'], $html, $matches);
+		preg_match_all($this->patterns['escapedVar'], $html, $matches);
 		foreach ($matches[0] as $key => $value) {
-			$html = str_replace($value, '<?php echo ' . $matches[1][$key] . '; ?>', $html);
+			$html = str_replace($value, '<?php echo ' . htmlspecialchars($matches[1][$key]) . '; ?>', $html);
 		}
 		return $html;
 	}
