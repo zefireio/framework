@@ -2,7 +2,9 @@
 
 namespace Zefire\Database;
 
-class Collection
+use Zefire\Contracts\Collectible;
+
+class Collection implements Collectible
 {
 	/**
      * Stores collected items
@@ -77,6 +79,34 @@ class Collection
         foreach ($ids as $id) {
         	$pivot->create([$this->ownerKey => $this->parentId, $this->foreignKey => $id]);
         }
+    }
+    /**
+     * Synchronises pivot records for relations between entities.
+     *
+     * @param  array  $ids
+     * @return object
+     */
+    public function sync(array $ids)
+    {
+        $existing_ids = [];
+        $pivot = $this->newInstance($this->pivot);
+        $pivot_records = $pivot->where($this->ownerKey, '=', $this->parentId)->get();
+        $existing_ids = [];
+        foreach ($pivot_records->items as $pivot_record) {
+            if (!in_array($pivot_record->id, $ids)) {
+                $key = array_search($pivot_record->id, $ids);
+                unset($ids[$key]);
+                $pivot_record->delete();
+            } else {
+                $key = array_search($pivot_record->id, $ids);
+                unset($ids[$key]);                
+            }
+        }
+        if (!empty($ids)) {
+            foreach ($ids as $id) {
+                $pivot->create([$this->ownerKey => $this->parentId, $this->foreignKey => $id]);
+            }    
+        }        
     }
     /**
      * Deletes pivot records to remove relations between entities.
