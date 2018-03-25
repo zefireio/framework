@@ -50,17 +50,17 @@ interface Rdbms
     /**
      * Defines a select directive.
      *
-     * @param  array $select
+     * @param  mixed $select
      * @return $this
      */
-    public function select(array $select = ['*']);
+    public function select($select = ['*']);
     /**
      * Defines a distinct directive.
      *
-     * @param  array $distinct
+     * @param  mixed $distinct
      * @return $this
      */
-    public function distinct(array $distinct);
+    public function distinct($distinct);
     /**
      * Defines a join directive.
      *
@@ -119,10 +119,10 @@ interface Rdbms
     /**
      * Defines a group by in directive.
      *
-     * @param  array  $array
+     * @param  mixed  $groupBy
      * @return $this
      */
-    public function groupBy(array $array);
+    public function groupBy($groupBy);
     /**
      * Defines a flag to retrieve trashed records.
      *
@@ -203,9 +203,38 @@ interface Rdbms
     /**
      * Returns a count of records for a given query.
      *
+     * @param  mixed $fields
      * @return int
      */
-    public function count();
+    public function count($fields = false);
+    /**
+     * Performs a max aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function max($fields = false);
+    /**
+     * Performs a min aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function min($fields = false);
+    /**
+     * Performs a avg aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function avg($fields = false);
+    /**
+     * Performs a sum aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function sum($fields = false);
     /**
      * Returns the first record for a given query.
      *

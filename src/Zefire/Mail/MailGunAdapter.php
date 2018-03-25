@@ -83,7 +83,8 @@ class MailGunAdapter
         if (isset($this->config['opens']) && $this->config['opens'] === true) {
             $this->data['o:tracking-opens'] = 'yes';
         }
-        return $this->call();
+        $response = $this->call();
+        return (is_array($mail) && $mail['message'] == 'Queued. Thank you.') ? true : false;
     }
     /**
      * Converts a name email pair to a string.

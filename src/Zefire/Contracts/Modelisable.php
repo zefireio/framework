@@ -60,9 +60,38 @@ interface Modelisable
     /**
      * Executes a count(*) query and returns count.
      *
+     * @param  mixed $fields
      * @return int
      */
-    public function count();
+    public function count($fields = false);
+    /**
+     * Executes a max(*) query and returns max.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function max($fields = false);
+    /**
+     * Executes a min(*) query and returns min.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function min($fields = false);
+    /**
+     * Executes an avg(*) query and returns avg.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function avg($fields = false);
+    /**
+     * Executes a sum(*) query and returns sum.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function sum($fields = false);
     /**
      * Retrieves first record.
      *

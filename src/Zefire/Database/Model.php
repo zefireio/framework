@@ -23,17 +23,17 @@ abstract class Model extends Database implements Modelisable
      */
     protected $attributes = [];
     /**
+     * Flags a model to indicate if query returned results.
+     *
+     * @var bool
+     */
+    protected $hasResults = false;
+    /**
      * Stores a list of relations.
      *
      * @var array
      */
     protected $with = [];
-    /**
-     * Stores relations.
-     *
-     * @var array
-     */
-    protected $relations;
     /**
      * Stores a pivot table.
      *
@@ -134,21 +134,65 @@ abstract class Model extends Database implements Modelisable
     {
         $res = parent::find($id);
         if ($res != null) {
+            $this->hasResults = true;
             foreach ($res as $key => $value) {
                 $this->attributes[$key] = $value;
             }
             $this->loadRelations();
+        } else {
+            $this->hasResults = false;
         }
         return $this;
     }
     /**
      * Executes a count(*) query and returns count.
      *
+     * @param  mixed $fields
      * @return int
      */
-    public function count()
+    public function count($fields = false)
     {
-        return parent::count();
+        return parent::count($fields);
+    }
+    /**
+     * Executes a max(*) query and returns max.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function max($fields = false)
+    {
+        return parent::max($fields);
+    }
+    /**
+     * Executes a min(*) query and returns min.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function min($fields = false)
+    {
+        return parent::min($fields);
+    }
+    /**
+     * Executes an avg(*) query and returns avg.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function avg($fields = false)
+    {
+        return parent::avg($fields);
+    }
+    /**
+     * Executes a sum(*) query and returns sum.
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function sum($fields = false)
+    {
+        return parent::sum($fields);
     }
     /**
      * Retrieves first record.
@@ -159,12 +203,24 @@ abstract class Model extends Database implements Modelisable
     {
         $res = parent::first();
         if ($res != null) {
+            $this->hasResults = true;
             foreach ($res as $key => $value) {
                 $this->attributes[$key] = $value;
             }
             $this->loadRelations();    
+        }else {
+            $this->hasResults = false;
         }
         return $this;
+    }
+    /**
+     * Indicates if the query returned results.
+     *
+     * @return bool
+     */
+    public function hasResults()
+    {
+        return $this->hasResults;
     }
     /**
      * Retrieves all records.
@@ -183,10 +239,7 @@ abstract class Model extends Database implements Modelisable
      */
     public function with($relations)
     {
-        if (!is_array($relations)) {
-            $explode = explode('|', $relations);
-            $relations = $explode;
-        }
+        $relations = $this->stringToArray($relations);
         foreach ($relations as $relation) {
             $this->with[] = $relation;          
         }
@@ -235,7 +288,14 @@ abstract class Model extends Database implements Modelisable
                 $ids[] = $pivot_record->$foreignKey;
             }
             $related_instance = $this->newInstance($related);
-            return $related_instance->whereIn('id', $ids)->get();    
+            $related_instance = $related_instance->whereIn('id', $ids)->get();
+
+            $related_instance->parentId = $this->id;
+            $related_instance->ownerKey = $ownerKey;
+            $related_instance->foreignKey = $foreignKey;
+            $related_instance->pivot = $pivot;
+            $related_instance->related = $this->newInstance($related);
+            return $related_instance;
         } else {
             $this->pivot = null;
         }       
@@ -248,21 +308,21 @@ abstract class Model extends Database implements Modelisable
     public function loadRelations()
     {
         $relations = [];
-        foreach ($this->with as $relation) {
-            $relations[] = $this->$relation();  
-        }
-        switch (count($relations)) {
-            case 0:
-                $this->relations = null;
-                break;
-            case 1:
-                $this->relations = $relations[0];
-                break;
-            default:
-                $this->relations = $relations;
-                break;
+        foreach ($this->with as $with) {
+            $this->$with = $this->$with();
         }
         return $this;
+        // switch (count($relations)) {
+        //     case 0:
+        //         $this->relations = null;
+        //         break;
+        //     case 1:
+        //         $this->relations = $relations[0];
+        //         break;
+        //     default:
+        //         $this->relations = $relations;
+        //         break;
+        // }
     }
     /**
      * Converts record to an array of attributes.

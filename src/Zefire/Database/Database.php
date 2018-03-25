@@ -196,23 +196,23 @@ abstract class Database implements Rdbms
     /**
      * Defines a select directive.
      *
-     * @param  array $select
+     * @param  mixed $select
      * @return $this
      */
-    public function select(array $select = ['*'])
+    public function select($select = ['*'])
     {
-        $this->select = $select;
+        $this->select = $this->stringToArray($select);
         return $this;
     }
     /**
      * Defines a distinct directive.
      *
-     * @param  array $distinct
+     * @param  mixed $distinct
      * @return $this
      */
-    public function distinct(array $distinct)
+    public function distinct($distinct)
     {
-        $this->distinct = $distinct;
+        $this->distinct = $this->stringToArray($distinct);
         return $this;
     }
     /**
@@ -314,12 +314,12 @@ abstract class Database implements Rdbms
     /**
      * Defines a group by in directive.
      *
-     * @param  array  $array
+     * @param  mixed  $groupBy
      * @return $this
      */
-    public function groupBy(array $array)
+    public function groupBy($groupBy)
     {
-        $this->groupBy = $array;
+        $this->groupBy = $this->stringToArray($groupBy);
         return $this;
     }
     /**
@@ -521,12 +521,87 @@ abstract class Database implements Rdbms
     /**
      * Returns a count of records for a given query.
      *
+     * @param  mixed $fields
      * @return int
      */
-    public function count()
+    public function count($fields = false)
     {
+        if ($fields === false) {
+            $this->select = ['count(*) as count'];    
+        } else {
+            $this->select = $this->stringToArray($fields, 'count');    
+        }        
         $this->query();
-        return $this->statement->rowCount();
+        $res = $this->statement->fetch(PDO::FETCH_OBJ);
+        return $res->count;
+    }
+    /**
+     * Performs a max aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function max($fields = false)
+    {
+        if ($fields === false) {
+            $this->select = ['count(*) as max'];    
+        } else {
+            $this->select = $this->stringToArray($fields, 'max');    
+        }        
+        $this->query();
+        $res = $this->statement->fetch(PDO::FETCH_OBJ);
+        return $res->max;
+    }
+    /**
+     * Performs a min aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function min($fields = false)
+    {
+        if ($fields === false) {
+            $this->select = ['count(*) as min'];    
+        } else {
+            $this->select = $this->stringToArray($fields, 'min');    
+        }        
+        $this->query();
+        $res = $this->statement->fetch(PDO::FETCH_OBJ);
+        return $res->min;
+    }
+    /**
+     * Performs a avg aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function avg($fields = false)
+    {
+        if ($fields === false) {
+            $this->select = ['count(*) as avg'];    
+        } else {
+            $this->select = $this->stringToArray($fields, 'avg');    
+        }        
+        $this->query();
+        $res = $this->statement->fetch(PDO::FETCH_OBJ);
+        return $res->avg;
+    }
+    /**
+     * Performs a sum aggregate function and returns result
+     *
+     * @param  mixed $fields
+     * @return int
+     */
+    public function sum($fields = false)
+    {
+        if ($fields === false) {
+            $this->select = ['count(*) as sum'];    
+        } else {
+            $this->select = $this->stringToArray($fields, 'sum');    
+        }        
+        $this->query();
+        $res = $this->statement->fetch(PDO::FETCH_OBJ);
+        return $res->sum;
     }
     /**
      * Returns the first record for a given query.
@@ -608,6 +683,27 @@ abstract class Database implements Rdbms
             default:
                 return $this->statement->rowCount();
         }
+    }
+    /**
+     * Converts a string of fields to array if needed.
+     *
+     * @param  mixed  $data
+     * @return array
+     */
+    protected function stringToArray($data, $aggregate = false)
+    {
+        if (!is_array($data)) {
+            $explode = explode('|', $data);
+            $data = $explode;
+        }
+        if ($aggregate !== false) {
+            $aggregated_string = $aggregate . '(' . implode(',', $data);
+            $aggregated_string = substr($aggregated_string, 0, -1);
+            $aggregated_string .= ')';
+            return [$aggregated_string];
+        } else {
+            return $data;    
+        }        
     }
     /**
      * Performs a SQL query based on registered directives.
