@@ -5,19 +5,6 @@ namespace Zefire\Contracts;
 interface DatabaseAdapter
 {
     /**
-     * Generates a get sql mode SQL syntax.
-     *
-     * @return string
-     */
-    public function getSqlMode();
-    /**
-     * Generates a set sql mode SQL syntax.
-     *
-     * @param  array  $modes
-     * @return string
-     */
-    public function setSqlMode(array $modes);
-    /**
      * Generates a show columns SQL syntax.
      *
      * @param  string $table
@@ -69,6 +56,7 @@ interface DatabaseAdapter
      * @param  array  $where_not_in
      * @param  array  $where
      * @param  array  $between
+     * @param  array  $not_between
      * @param  array  $group
      * @param  array  $having
      * @param  array  $order
@@ -77,5 +65,5 @@ interface DatabaseAdapter
      * @param  bool   $trashed
      * @return string
      */
-    public function query(string $table, array $select, array $distinct, array $join, array $where_in, array $where_not_in, array $where, array $between, array $group, array $having, array $order, $limit, $offset, $trashed);
+    public function query(string $table, array $select, array $distinct, array $join, array $where_in, array $where_not_in, array $where, array $between, array $not_between, array $group, array $having, array $order, $limit, $offset, $trashed);
 }

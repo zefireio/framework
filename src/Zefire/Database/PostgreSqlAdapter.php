@@ -7,31 +7,6 @@ use Zefire\Contracts\DatabaseAdapter;
 class PostgreSqlAdapter implements DatabaseAdapter
 {
     /**
-     * Stores a count of conditions.
-     *
-     * @var int
-     */
-    protected $conditions = 0;
-    /**
-     * Generates a get sql mode SQL syntax.
-     *
-     * @return string
-     */
-    public function getSqlMode()
-    {
-        return "SELECT @@SESSION.sql_mode;";
-    }
-    /**
-     * Generates a set sql mode SQL syntax.
-     *
-     * @param  array  $modes
-     * @return string
-     */
-    public function setSqlMode(array $modes)
-    {
-        return "SET SESSION sql_mode='" . implode(',', $modes) . "';";
-    }
-    /**
      * Generates a show columns SQL syntax.
      *
      * @param  string $table
@@ -155,6 +130,7 @@ class PostgreSqlAdapter implements DatabaseAdapter
      * @param  array  $where_not_in
      * @param  array  $where
      * @param  array  $between
+     * @param  array  $not_between
      * @param  array  $group
      * @param  array  $having
      * @param  array  $order
@@ -172,6 +148,7 @@ class PostgreSqlAdapter implements DatabaseAdapter
         array $where_not_in,
         array $where,
         array $between,
+        array $not_between,
         array $group,
         array $having,
         array $order,
@@ -191,7 +168,13 @@ class PostgreSqlAdapter implements DatabaseAdapter
         $between_condition = '';
         if (!empty($between)) {
             $operator = ($this->conditions == 0) ? ' WHERE ' : ' AND ';
-            $between_condition .= $operator . $between['field'] . ' BETWEEN :start_date AND :end_date';
+            $between_condition .= $operator . $between['field'] . ' BETWEEN :value1 AND :value2';
+            $this->conditions++;
+        }
+        $not_between_condition = '';
+        if (!empty($not_between)) {
+            $operator = ($this->conditions == 0) ? ' WHERE ' : ' AND ';
+            $not_between_condition .= $operator . $not_between['field'] . ' NOT BETWEEN :value1 AND :value2';
             $this->conditions++;
         }
         $where_in_condition = '';
@@ -245,7 +228,7 @@ class PostgreSqlAdapter implements DatabaseAdapter
         if (!empty($order)) {
             $order_condition .= ' ORDER BY `' . key($order) . '` ' . $order[key($order)];
         }
-        $sql = $select . $distinct . ' FROM `' . $table . '` ' . $join_condition . $between_condition . $where_in_condition . $where_not_in_condition . $conditions;
+        $sql = $select . $distinct . ' FROM `' . $table . '` ' . $join_condition . $between_condition . $not_between_condition . $where_in_condition . $where_not_in_condition . $conditions;
         if ($trashed === false) {
             $sql .= ($this->conditions == 0) ? ' WHERE `deleted_at` IS NULL' : ' AND `deleted_at` IS NULL';
         }

@@ -288,7 +288,7 @@ abstract class Model extends Database implements Modelisable
                 $ids[] = $pivot_record->$foreignKey;
             }
             $related_instance = $this->newInstance($related);
-            $related_instance = $related_instance->whereIn('id', $ids)->get();
+            $related_instance = $related_instance->in('id', $ids)->get();
 
             $related_instance->parentId = $this->id;
             $related_instance->ownerKey = $ownerKey;
@@ -312,17 +312,6 @@ abstract class Model extends Database implements Modelisable
             $this->$with = $this->$with();
         }
         return $this;
-        // switch (count($relations)) {
-        //     case 0:
-        //         $this->relations = null;
-        //         break;
-        //     case 1:
-        //         $this->relations = $relations[0];
-        //         break;
-        //     default:
-        //         $this->relations = $relations;
-        //         break;
-        // }
     }
     /**
      * Converts record to an array of attributes.

@@ -37,19 +37,25 @@ abstract class Database implements Rdbms
      *
      * @var array
      */
-    protected $whereIn = [];
+    protected $in = [];
     /**
      * Stores where not in directives.
      *
      * @var array
      */
-    protected $whereNotIn = [];
+    protected $notIn = [];
     /**
      * Stores between directives.
      *
      * @var array
      */
     protected $between = [];
+    /**
+     * Stores not between directives.
+     *
+     * @var array
+     */
+    protected $notBetween = [];
     /**
      * Stores group by directives.
      *
@@ -273,9 +279,9 @@ abstract class Database implements Rdbms
      * @param  array  $array
      * @return $this
      */
-    public function whereIn(string $field, array $array)
+    public function in(string $field, array $array)
     {
-        $this->whereIn[] = [
+        $this->in[] = [
             'field'     => $field,
             'operator'  => 'IN',
             'array'     => $array
@@ -289,9 +295,9 @@ abstract class Database implements Rdbms
      * @param  array  $array
      * @return $this
      */
-    public function whereNotIn(string $field, array $array)
+    public function notIn(string $field, array $array)
     {
-        $this->whereNotIn[] = [
+        $this->notIn[] = [
             'field'     => $field,
             'operator'  => 'NOT IN',
             'array'     => $array
@@ -302,13 +308,26 @@ abstract class Database implements Rdbms
      * Defines a between directive.
      *
      * @param  string $field
-     * @param  string $start_date
-     * @param  string $end_date
+     * @param  string $value1
+     * @param  string $value2
      * @return $this
      */
-    public function between(string $field, string $start_date, string $end_date)
+    public function between(string $field, string $value1, string $value2)
     {
-        $this->between = ['field' => $field, 'start_date' => $start_date, 'end_date' => $end_date];
+        $this->between = ['field' => $field, 'value1' => $value1, 'value2' => $value2];
+        return $this;
+    }
+    /**
+     * Defines a not between directive.
+     *
+     * @param  string $field
+     * @param  string $value1
+     * @param  string $value2
+     * @return $this
+     */
+    public function notBetween(string $field, string $value1, string $value2)
+    {
+        $this->notBetween = ['field' => $field, 'value1' => $value1, 'value2' => $value2];
         return $this;
     }
     /**
@@ -717,10 +736,11 @@ abstract class Database implements Rdbms
             $this->select,
             $this->distinct,
             $this->join,
-            $this->whereIn,
-            $this->whereNotIn,
+            $this->in,
+            $this->notIn,
             $this->where,
             $this->between,
+            $this->notBetween,
             $this->groupBy,
             $this->having,
             $this->orderBy,
@@ -729,8 +749,12 @@ abstract class Database implements Rdbms
             $this->withTrashed
         ));
         if (!empty($this->between)) {
-            $this->bind('start_date', $this->between['start_date']);
-            $this->bind('end_date', $this->between['end_date']);
+            $this->bind('value1', $this->between['value1']);
+            $this->bind('value2', $this->between['value2']);
+        }
+        if (!empty($this->notBetween)) {
+            $this->bind('value1', $this->notBetween['value1']);
+            $this->bind('value2', $this->notBetween['value2']);
         }
         if (!empty($this->where)) {
             foreach ($this->where as $key => $value) {

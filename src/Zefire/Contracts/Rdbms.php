@@ -98,7 +98,7 @@ interface Rdbms
      * @param  array  $array
      * @return $this
      */
-    public function whereIn(string $field, array $array);
+    public function in(string $field, array $array);
     /**
      * Defines a where not in directive.
      *
@@ -106,16 +106,25 @@ interface Rdbms
      * @param  array  $array
      * @return $this
      */
-    public function whereNotIn(string $field, array $array);
+    public function notIn(string $field, array $array);
     /**
      * Defines a between directive.
      *
      * @param  string $field
-     * @param  string $start_date
-     * @param  string $end_date
+     * @param  string $value1
+     * @param  string $value2
      * @return $this
      */
-    public function between(string $field, string $start_date, string $end_date);
+    public function between(string $field, string $value1, string $value2);
+    /**
+     * Defines a not between directive.
+     *
+     * @param  string $field
+     * @param  string $value1
+     * @param  string $value2
+     * @return $this
+     */
+    public function notBetween(string $field, string $value1, string $value2);
     /**
      * Defines a group by in directive.
      *

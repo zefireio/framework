@@ -117,7 +117,7 @@ class Collection implements Collectible
     public function detach(array $ids)
     {
         $pivot = $this->newInstance($this->pivot);
-        $pivot_records = $pivot->where($this->ownerKey, '=', $this->parentId)->whereIn($this->foreignKey, $ids)->get();
+        $pivot_records = $pivot->where($this->ownerKey, '=', $this->parentId)->in($this->foreignKey, $ids)->get();
         foreach ($pivot_records->items as $record) {
     		$record->delete();        		
     	}        
