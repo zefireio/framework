@@ -91,7 +91,7 @@ class Application
         // Load Helpers
         include $this->zefirePath() . 'Helpers' . DIRECTORY_SEPARATOR . 'helpers.php';
         // Set error handlers
-        // $this->setErrorHandlers();
+        $this->setErrorHandlers();
         // Set CSRF Token
         $this->csrfToken();
         // Set kernel load time to session.
