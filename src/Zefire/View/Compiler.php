@@ -30,6 +30,7 @@ class Compiler
 		'startRawPhp' 		=> '#@php#',
 		'endRawPhp' 		=> '#@endphp#',
 		'include' 			=> '#@include\((.*)\)#',
+		'csrf' 				=> '#@csrf#',
 		'startForeachLoop' 	=> '#@foreach\((.*)(as)(.*)\)#',
 		'endForeachLoop' 	=> '#@endforeach#',
 		'startForLoop' 		=> '#@for\((.*)\)#',
@@ -61,6 +62,7 @@ class Compiler
 		$html = $this->yield($html);
 		$html = $this->translate($html);
 		$html = $this->include($html);
+		$html = $this->csrf($html);
 		$html = $this->comment($html);
 		$html = $this->startRawPhp($html);
 		$html = $this->endRawPhp($html);
@@ -204,6 +206,16 @@ class Compiler
 			$html = str_replace($value, $this->make(file_get_contents(\App::templatePath() . $this->toPath($matches[1][$key]) . '.php')), $html);
 		}
 		return $html;		
+	}
+	/**
+     * Finds all csrf directives and injects a hidden input with CSRF token.
+     *
+     * @param  string $html
+     * @return string
+     */
+	protected function csrf($html)
+	{
+		return preg_replace($this->patterns['csrf'], '<input type="hidden" name="X-CSRF-TOKEN" value="'. \Session::get('XSRF-TOKEN') .'">', $html);
 	}	
 	/**
      * Starts a foreach loop php tag.

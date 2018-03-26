@@ -80,9 +80,12 @@ class Request
 	{
 		switch ($this->method()) {
 			case 'GET':
+			case 'HEAD':
+			case 'OPTIONS':
 				$input = $_GET;
 				break;
 			case 'POST':
+			case 'PATCH':
 			case 'PUT':
 			case 'DELETE':
 				$input = $_POST;

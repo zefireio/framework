@@ -281,6 +281,7 @@ class Register extends Registration
 @section('content')
     <div class=\"content\">
         <form action=\"/auth/login\" method=\"POST\">
+        	@csrf
             <p><label for=\"email\"><b>{{ translate('auth.email') }}</b></label></p>
             <p><input type=\"text\" placeholder=\"" . $email . "\" name=\"email\" required></p>
 
@@ -297,6 +298,7 @@ class Register extends Registration
 @section('content')
     <div class=\"content\">
         <form action=\"/auth/register\" method=\"POST\">
+        	@csrf
             <p><label for=\"email\"><b>{{ translate('auth.email') }}</b></label></p>
             <p><input type=\"text\" placeholder=\"" . $email . "\" name=\"email\" required></p>
 

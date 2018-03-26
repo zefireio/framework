@@ -391,7 +391,7 @@ class Application
      */
     public function csrfToken()
     {
-        $token = \Session::get('X-CSRF-TOKEN');
+        $token = \Session::get('XSRF-TOKEN');
         if ($token == null) {
             $token = \Hasher::make(uniqid(rand(), true));
             \Session::set('XSRF-TOKEN', $token);
