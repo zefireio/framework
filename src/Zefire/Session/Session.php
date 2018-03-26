@@ -4,7 +4,6 @@ namespace Zefire\Session;
 
 use Zefire\Contracts\Storable;
 use Zefire\Helpers\Arr;
-use Zefire\Session\FileSessionHandler;
 
 class Session implements Storable
 {

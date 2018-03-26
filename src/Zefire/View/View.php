@@ -2,6 +2,7 @@
 
 namespace Zefire\View;
 
+use Zefire\FileSystem\FileSystem;
 use Zefire\View\Compiler;
 use Zefire\View\Engine;
 use Zefire\Hashing\Hasher;
@@ -9,6 +10,12 @@ use Zefire\Hashing\Hasher;
 class View
 {
 	/**
+     * Stores the view FileSystem instance.
+     *
+     * @var \Zefire\FileSystem\FileSystem
+     */
+     protected $fileSystem;
+     /**
      * Stores the view compiler instance.
      *
      * @var \Zefire\View\Compiler
@@ -53,16 +60,18 @@ class View
 	/**
      * Creates a new view instance.
      *
-     * @param  \Zefire\View\Engine    $engine
-     * @param  \Zefire\View\Compiler  $compiler
-     * @param  \Zefire\Hashing\Hasher $hasher
+     * @param  \Zefire\FileSystem\FileSystem  $fileSystem
+     * @param  \Zefire\View\Engine            $engine
+     * @param  \Zefire\View\Compiler          $compiler
+     * @param  \Zefire\Hashing\Hasher         $hasher
      * @return void
      */
-	public function __construct(Engine $engine, Compiler $compiler, Hasher $hasher)
+	public function __construct(FileSystem $fileSystem, Engine $engine, Compiler $compiler, Hasher $hasher)
 	{
-		$this->engine 	= $engine;
-		$this->compiler = $compiler;
-		$this->hasher 	= $hasher;
+		$this->fileSystem = $fileSystem;
+          $this->engine     = $engine;
+		$this->compiler   = $compiler;
+		$this->hasher     = $hasher;
 	}
 	/**
      * Renders a compiled view to the browser.
@@ -88,7 +97,7 @@ class View
 		$obLevel = ob_get_level();
 		ob_start();
 		try {
-            include \App::compiledPath() . $this->id . $this->fileExtension;
+            include \App::compiledPath() . DIRECTORY_SEPARATOR . $this->id . $this->fileExtension;
         } catch (Exception $exception) {
             throw new \Exception($exception, $obLevel);            
         }
@@ -102,7 +111,7 @@ class View
      */
 	protected function getTemplate($template)
 	{
-		$this->template = file_get_contents(\App::templatePath() . $this->toPath($template) . $this->fileExtension);
+		$this->template = $this->fileSystem->disk('templates')->get($this->toPath($template) . $this->fileExtension);          
 	}
 	/**
      * Validates a file path.

@@ -5,7 +5,7 @@ namespace Zefire\Exception;
 use \Exception;
 use \ErrorException;
 use Zefire\Contracts\Throwable;
-use Zefire\Filesystem\File;
+use Zefire\Filesystem\FileSystem;
 use Zefire\Log\Log;
 use Zefire\Http\Response as HttpResponse;
 use Zefire\Console\Response as CliResponse;
@@ -134,7 +134,7 @@ class ExceptionHandler implements Throwable
      */
     protected static function addLogEntry($exception)
     {
-        $logger = new Log(new File());
+        $logger = new Log(new FileSystem());
         $logger->push($exception);
     }
     /**

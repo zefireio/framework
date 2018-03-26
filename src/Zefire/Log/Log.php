@@ -1,34 +1,35 @@
 <?php
 namespace Zefire\Log;
 
-use Zefire\FileSystem\File;
+use Zefire\FileSystem\FileSystem;
 
 class Log
 {
     /**
-     * Stores a file instance.
+     * Stores a FileSystem instance.
      *
-     * @var Zefire\FileSystem\File
+     * @var Zefire\FileSystem\FileSystem
      */
-    protected $file;
+    protected $fileSystem;
     /**
      * Stores log files paths.
      *
      * @var array
      */
-    protected $logFile = [];
+    protected $logFile = [
+        'error' => 'error.log',
+        'app'   => 'app.log',
+        'db'    => 'db.log'
+    ];
     /**
      * Creates a new log instance.
      *
-     * @param  Zefire\FileSystem\File $file
+     * @param  Zefire\FileSystem\FileSystem $fileSystem
      * @return void
      */
-    public function __construct(File $file)
+    public function __construct(FileSystem $fileSystem)
     {
-        $this->file = $file;
-        $this->logFile['error'] = \App::logPath() . 'error.log';
-        $this->logFile['app'] = \App::logPath() . 'app.log';
-        $this->logFile['db'] = \App::logPath() . 'db.log';
+        $this->fileSystem = $fileSystem;
     }
     /**
      * Add a new entry to log file.
@@ -39,10 +40,10 @@ class Log
      */
     public function push($logEntry, $type = 'error')
     {
-        if ($this->file->exists($this->logFile[$type]) && $this->file->isWritable($this->logFile[$type])) {
-            $this->file->append($this->logFile[$type], date("Y-m-d H:i:s") . ': ' . $logEntry . "\n");
+        if ($this->fileSystem->disk('logs')->exists($this->logFile[$type])) {
+            $this->fileSystem->disk('logs')->append($this->logFile[$type], date("Y-m-d H:i:s") . ': ' . $logEntry . "\n");
         } else {
-            $this->file->put($this->logFile[$type], date("Y-m-d H:i:s") . ': ' . $logEntry . "\n");
-        }
+            $this->fileSystem->disk('logs')->put($this->logFile[$type], date("Y-m-d H:i:s") . ': ' . $logEntry . "\n");
+        }        
     }
 }

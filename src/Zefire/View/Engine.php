@@ -3,16 +3,16 @@
 namespace Zefire\View;
 
 use Zefire\Contracts\ViewEngine;
-use Zefire\FileSystem\File;
+use Zefire\FileSystem\FileSystem;
 
 class Engine implements ViewEngine
 {
 	/**
-     * Stores a file instance.
+     * Stores a FileSystem instance.
      *
-     * @var \Zefire\FileSystem\File
+     * @var \Zefire\FileSystem\FileSystem
      */
-	protected $file;
+	protected $fileSystem;
 	/**
      * Compiled view file extension.
      *
@@ -22,12 +22,12 @@ class Engine implements ViewEngine
 	/**
      * Stores a file instance.
      *
-     * @param  \Zefire\FileSystem\File $file
+     * @param  \Zefire\FileSystem\FileSystem $fileSystem
      * @return void
      */
-	public function __construct(File $file)
+	public function __construct(FileSystem $fileSystem)
 	{
-		$this->file = $file;
+		$this->fileSystem = $fileSystem;
 	}
 	/**
      * Stores a compiled template output in a file.
@@ -38,7 +38,7 @@ class Engine implements ViewEngine
      */
 	public function put($filename, $data)
 	{
-		$this->file->put(\App::compiledPath() . $filename . $this->extension, $data);		
+		$this->fileSystem->disk('compiled')->put($filename . $this->extension, $data);
 	}
 	/**
      * Checks if a compiled view exists.
@@ -48,7 +48,7 @@ class Engine implements ViewEngine
      */
 	public function exists($filename)
 	{
-		return ($this->file->exists(\App::compiledPath() . $filename . $this->extension)) ? 1 : 0;
+		return ($this->fileSystem->disk('compiled')->exists($filename . $this->extension, $data)) ? true : false;
 	}
 	/**
      * Gets a compiled view.
@@ -58,8 +58,8 @@ class Engine implements ViewEngine
      */
 	public function get($filename)
 	{
-		if ($this->file->exists(\App::compiledPath() . $filename . $this->extension)) {
-			return $this->file->get(\App::compiledPath() . $filename . $this->extension);
+		if ($this->fileSystem->disk('compiled')->exists($filename . $this->extension)) {
+			return $this->fileSystem->disk('compiled')->get($filename . $this->extension);
 		} else {
 			throw new \Exception('File does not exist');
 		}
@@ -72,15 +72,14 @@ class Engine implements ViewEngine
      */
 	public function expired($filename)
 	{
-		if ($this->file->exists(\App::compiledPath() . $filename . $this->extension)) {
-			if (filemtime(\App::compiledPath() . $filename . $this->extension) + \App::config('view.max_life') < time() && file_exists(\App::compiledPath() . $filename . $this->extension)) {
-	            unlink(\App::compiledPath() . $filename . $this->extension);
-	            return 1;
-	        } else {
-	        	return 0;
-	        }
-	    } else {
-	    	return 1;
-	    }
+		if ($this->fileSystem->disk('compiled')->exists($filename . $this->extension)) {
+			if ((time() - $this->fileSystem->disk('compiled')->lastModified($filename . $this->extension)) > \App::config('view.max_life')) {
+				$this->fileSystem->disk('compiled')->delete($filename . $this->extension);
+				return true;
+			}
+			return false;
+		} else {
+			return true;
+		}
 	}
 }

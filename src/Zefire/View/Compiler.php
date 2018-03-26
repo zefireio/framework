@@ -2,6 +2,8 @@
 
 namespace Zefire\View;
 
+use Zefire\FileSystem\FileSystem;
+
 class Compiler
 {
 	/**
@@ -46,6 +48,16 @@ class Compiler
 		'endIfStatement' 	=> '#@endif#',
 		'runtime' 			=> '#@runtime#'
 	];
+	/**
+     * Creates a new comiler instance.
+     *
+     * @param  \Zefire\FileSystem\FileSystem $fileSystem
+     * @return void
+     */
+	public function __construct(FileSystem $fileSystem)
+	{
+		$this->fileSystem = $fileSystem;
+	}
 	/**
      * Compiles a template into a view.
      *
@@ -140,7 +152,8 @@ class Compiler
 	{
 		preg_match_all($this->patterns['extend'], $html, $matches);
 		foreach ($matches[0] as $key => $value) {
-			$html = str_replace($value, $this->make(file_get_contents(\App::templatePath() . $this->toPath($matches[1][$key]) . '.php')), $html);
+
+			$html = str_replace($value, $this->make($this->fileSystem->disk('templates')->get($this->toPath($matches[1][$key]) . '.php')), $html);
 		}
 		return $html;		
 	}
@@ -203,7 +216,7 @@ class Compiler
 	{
 		preg_match_all($this->patterns['include'], $html, $matches);
 		foreach ($matches[0] as $key => $value) {
-			$html = str_replace($value, $this->make(file_get_contents(\App::templatePath() . $this->toPath($matches[1][$key]) . '.php')), $html);
+			$html = str_replace($value, $this->make($this->fileSystem->disk('templates')->get($this->toPath($matches[1][$key]) . '.php')), $html);
 		}
 		return $html;		
 	}

@@ -81,6 +81,32 @@ class FileSystem implements Fillable
         return $this->disk->get($file);
     }
     /**
+     * Prepends content to an existing file.
+     *
+     * @param  string $file
+     * @param  string $content
+     * @return string
+     */
+    public function prepend($file, $content)
+    {
+        if ($this->exists($file)) {
+            return $this->put($file, $content . $this->disk->get($file));
+        }        
+    }
+    /**
+     * Appends content to an existing file.
+     *
+     * @param  string $file
+     * @param  string $content
+     * @return string
+     */
+    public function append($file, $content)
+    {
+        if ($this->exists($file)) {
+            return $this->put($file, $this->disk->get($file) . $content);
+        }        
+    }
+    /**
      * returns path.
      *
      * @return string

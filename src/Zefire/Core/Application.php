@@ -89,7 +89,7 @@ class Application
             $this->aliases[$key] = $value;            
         }
         // Load Helpers
-        include $this->zefirePath() . 'Helpers' . DIRECTORY_SEPARATOR . 'helpers.php';
+        include $this->zefirePath() . DIRECTORY_SEPARATOR. 'Helpers' . DIRECTORY_SEPARATOR . 'helpers.php';
         // Set error handlers
         $this->setErrorHandlers();
         // Set CSRF Token
@@ -238,7 +238,7 @@ class Application
      */
     public function appPath()
     {    
-        return $this->basePath . 'app' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'app';
     }    
     /**
      * Returns the vendor's folder path.
@@ -247,7 +247,7 @@ class Application
      */
     public function vendorPath()
     {    
-        return $this->basePath . 'vendor' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'vendor';
     }
     /**
      * Returns the framework's folder path.
@@ -256,7 +256,7 @@ class Application
      */
     public function zefirePath()
     {    
-        return $this->vendorPath() . 'zefireio' . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR .  'src' . DIRECTORY_SEPARATOR . 'Zefire' . DIRECTORY_SEPARATOR;
+        return $this->vendorPath() . DIRECTORY_SEPARATOR . 'zefireio' . DIRECTORY_SEPARATOR . 'framework' . DIRECTORY_SEPARATOR .  'src' . DIRECTORY_SEPARATOR . 'Zefire';
     }
     /**
      * Returns the config folder path.
@@ -265,7 +265,7 @@ class Application
      */
     public function configPath()
     {    
-        return $this->basePath . 'config' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'config';
     }
     /**
      * Returns the routing folder path.
@@ -274,7 +274,7 @@ class Application
      */
     public function routingPath()
     {    
-        return $this->basePath . 'routing' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'routing';
     }
     /**
      * Returns the resource folder path.
@@ -283,7 +283,7 @@ class Application
      */
     public function resourcesPath()
     {    
-        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'resources';
     }
     /**
      * Returns the assets folder path.
@@ -292,7 +292,7 @@ class Application
      */
     public function assetsPath()
     {    
-        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'assets';
     }
     /**
      * Returns the translation folder path.
@@ -301,7 +301,7 @@ class Application
      */
     public function translatePath()
     {
-        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'lang';
     }
     /**
      * Returns the template folder path.
@@ -310,7 +310,7 @@ class Application
      */
     public function templatePath()
     {    
-        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'resources' . DIRECTORY_SEPARATOR . 'templates';
     }
     /**
      * Returns the compiled template folder path.
@@ -320,9 +320,9 @@ class Application
     public function compiledPath()
     {    
         if (!file_exists($this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'views')) {
-            mkdir($this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'views', 0755, true);
+            mkdir($this->basePath . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'views', 0755, true);
         }
-        return $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR;
+        return $this->basePath . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'views';
     }
     /**
      * Returns the log folder path.
@@ -332,9 +332,9 @@ class Application
     public function logPath()
     {
         if (!file_exists($this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'logs')) {
-            mkdir($this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'logs', 0755, true);
+            mkdir($this->basePath . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'logs', 0755, true);
         }
-        return $this->basePath . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'logs';
     }
     /**
      * Returns the session folder path.
@@ -346,7 +346,7 @@ class Application
         if (!file_exists($this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'sessions')) {
             mkdir($this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'sessions', 0755, true);
         }
-        return $this->basePath . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'sessions' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'sessions';
     }
     /**
      * Returns the storage folder path.
@@ -358,7 +358,7 @@ class Application
         if (!file_exists($this->basePath . 'storage')) {
             mkdir($this->basePath . 'storage', 0755, true);
         }
-        return $this->basePath . 'storage' . DIRECTORY_SEPARATOR;
+        return $this->basePath . 'storage';
     }
     /**
      * Returns runtime.
@@ -382,7 +382,7 @@ class Application
      */
     public function maintenanceMode()
     {
-        return (file_get_contents(\App::storagePath() . 'Zefire') == 'true') ? true : false;
+        return (file_get_contents(\App::storagePath() . DIRECTORY_SEPARATOR . 'Zefire') == 'true') ? true : false;
     }
     /**
      * Generates CSRF Token and stores it into session.
@@ -406,7 +406,7 @@ class Application
      */
     protected function setBasePath()
     {
-        $this->basePath = (PHP_SAPI === 'cli') ? $_SERVER['PWD'] . DIRECTORY_SEPARATOR : str_replace('public', '', $_SERVER['DOCUMENT_ROOT']);
+        $this->basePath = (PHP_SAPI === 'cli') ? $_SERVER['PWD'] . DIRECTORY_SEPARATOR : str_replace('/public', '', $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR);
     }
     /**
      * Sets the application's running mode flag.

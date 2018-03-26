@@ -2,36 +2,24 @@
 
 namespace Zefire\Session;
 
-use Zefire\FileSystem\File;
+use Zefire\FileSystem\FileSystem;
 
 class FileSessionHandler implements \SessionHandlerInterface
 {
 	/**
-     * Stores a file instance.
+     * Stores a FileSystem instance.
      *
-     * @var \Zefire\FileSystem\File
+     * @var \Zefire\FileSystem\FileSystem
      */
-    protected $file;
-    /**
-     * Stores the session path.
-     *
-     * @var string
-     */
-	protected $path;
-    /**
-     * Stores the session id.
-     *
-     * @var string
-     */
-    protected $id;
+    protected $fileSystem;
     /**
      * Creates a new file session handler instance.
      *
      * @return void
      */
-	public function __construct(File $file)
+	public function __construct(FileSystem $fileSystem)
     {
-        $this->file = $file;        
+        $this->fileSystem = $fileSystem;        
     }
     /**
      * Open session save handler callback.
@@ -42,7 +30,6 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function open($savePath, $sessionName)
     {
-        $this->path = $savePath;
         return true;
     }
     /**
@@ -62,12 +49,8 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        $this->id = $sessionId;
-        $file = $this->path . '/' . $sessionId;
-        if (!$this->file->exists($file)) {
-            $this->file->put($file, $contents = '');
-        }
-        return $this->file->get($file, true);
+        $this->fileSystem->disk('sessions')->put($sessionId, '');
+        return $this->fileSystem->disk('sessions')->get($sessionId);
     }
     /**
      * Write session save handler callback.
@@ -78,7 +61,7 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $this->file->put($this->path . '/' . $sessionId, $data, true);
+        $this->fileSystem->disk('sessions')->put($sessionId, $data);
         return true;
     }
     /**
@@ -89,7 +72,7 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $this->file->delete($this->path . '/' . $sessionId);
+        $this->fileSystem->disk('sessions')->delete($sessionId);
         return true;
     }
     /**
@@ -100,9 +83,13 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function gc($lifetime)
     {
-        $file = $this->file->get($this->path . '/' . $this->id);
-        if (filemtime($file) + \App::config('session.life') < time() && file_exists($file)) {
-            unlink($file);
+        $files = \FileSystem::disk('sessions')->list();
+        foreach ($files as $file) {
+            if (!in_array($file, ['.', '..', '.DS_Store'])) {
+                if ((time() - $this->fileSystem->disk('compiled')->lastModified($file)) > \App::config('session.life')) {
+                    $this->fileSystem->disk('sessions')->delete($filename . $this->extension);
+                }
+            }
         }
     }
 }

@@ -28,10 +28,10 @@ class Arr
             }   
         } else {
             $split = explode('.', $key);
-            if (!file_exists(\App::configPath() . $split[0] . '.php')) {
+            if (!file_exists(\App::configPath() . DIRECTORY_SEPARATOR . $split[0] . '.php')) {
                 return null;
             }
-            $array = include \App::configPath() . $split[0] . '.php';
+            $array = include \App::configPath() . DIRECTORY_SEPARATOR . $split[0] . '.php';
             unset($split[0]);
             if (empty($split)) {
                 return $array;

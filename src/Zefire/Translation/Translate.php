@@ -32,7 +32,7 @@ class Translate
     {
         $locale = ($this->session->exists('locale.code')) ? $this->session->get('locale.code') : \App::config('app.default_lang');
         $split = explode('.', $this->strip($key));
-        $array = include \App::translatePath() . $locale . DIRECTORY_SEPARATOR . $split[0] . '.php';
+        $array = include \App::translatePath() . DIRECTORY_SEPARATOR . $locale . DIRECTORY_SEPARATOR . $split[0] . '.php';
         unset($split[0]);
         $key = implode('.', $split);
         $value = Arr::get($key, $array);

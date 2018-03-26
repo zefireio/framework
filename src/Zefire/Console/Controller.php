@@ -11,7 +11,7 @@ class Controller
      */
 	public function clearViews()
 	{
-		$this->clearFiles(\App::compiledPath());
+		$this->clearFiles('compiled');
 		return 'Cleared compiled views';
 	}
 	/**
@@ -21,7 +21,7 @@ class Controller
      */
 	public function clearSessions()
 	{
-		$this->clearFiles(\App::sessionPath());
+		$this->clearFiles('sessions');
 		return 'Cleared file sessions';
 	}
 	/**
@@ -31,7 +31,7 @@ class Controller
      */
 	public function clearLogs()
 	{
-		$this->clearFiles(\App::logPath());
+		$this->clearFiles('logs');
 		return 'Cleared log files';
 	}
 	/**
@@ -59,7 +59,7 @@ class Controller
      */
 	public function up()
 	{
-		\File::put(\App::storagePath() . 'Zefire', '');
+		\FileSystem::disk('storage')->put('Zefire', '');
 		return 'Zefire is up';		
 	}
 	/**
@@ -69,7 +69,7 @@ class Controller
      */
 	public function down()
 	{
-		\File::put(\App::storagePath() . 'Zefire', 'true');
+		\FileSystem::disk('storage')->put('Zefire', 'true');
 		return 'Zefire is in maintenance mode';
 	}
 	/**
@@ -382,17 +382,17 @@ class " . $controller . "
 		dd(\Hasher::make(\App::host() . uniqid(rand(), true)));
 	}
 	/**
-     * Deletes files from a specific folder.
+     * Deletes files from a specific disk.
      *
-     * @param  string $path
+     * @param  string $disk
      * @return string
      */
-	protected function clearFiles($path)
+	protected function clearFiles($disk)
 	{
-		$compiled = \File::files($path);
-		foreach ($compiled as $file) {
+		$files = \FileSystem::disk($disk)->list();
+		foreach ($files as $file) {
 			if (!in_array($file, ['.', '..', '.DS_Store'])) {
-				\File::delete($path . $file);
+				\FileSystem::disk($disk)->delete($file);
 			}
 		}
 	}

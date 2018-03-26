@@ -38,7 +38,7 @@ class Router
 		$this->maintenanceMode();
 		if (\App::runningMode() == 'http') {
 			$this->request = new HttpRequest();
-			include_once(\App::routingPath() . 'Routes.php');
+			include_once(\App::routingPath() . DIRECTORY_SEPARATOR . 'Routes.php');
 			$routes = \Route::getRoutes();
 			$this->route = $this->match($routes);
 			if ($this->route == null) {
@@ -49,8 +49,8 @@ class Router
 			}
 		} else {
 			$this->request = new CliRequest();
-			include_once(\App::zefirePath() . 'Console' . DIRECTORY_SEPARATOR . 'Commands.php');
-			include_once(\App::routingPath() . 'Commands.php');
+			include_once(\App::zefirePath() . DIRECTORY_SEPARATOR . 'Console' . DIRECTORY_SEPARATOR . 'Commands.php');
+			include_once(\App::routingPath() . DIRECTORY_SEPARATOR . 'Commands.php');
 			$commands = \Command::getCommands();
 			$this->command = $this->match($commands);
 			if ($this->command == null) {
