@@ -34,9 +34,7 @@ class Session implements Storable
     		array($this->driver, 'destroy'),
     		array($this->driver, 'gc')
     	);
-        if ($this->driver instanceOf FileSessionHandler) {
-            session_save_path(\App::sessionPath());
-        }
+        session_save_path(\App::sessionPath());
         session_start();        
     }
     /**
