@@ -111,7 +111,7 @@ class ExceptionHandler implements Throwable
     public static function handleError($level, $message, $file = '', $line = 0, $context = [])
     {
     	if (error_reporting() & $level) {
-    		self::handleException(new ErrorException($message, 0, $level, $file, $line));
+            self::handleException(new ErrorException($message, 0, $level, $file, $line));
         }
     }
     /**
@@ -123,7 +123,7 @@ class ExceptionHandler implements Throwable
     {
     	$error = error_get_last();
         if (!is_null($error) && self::isFatal($error['type'])) {
-            self::handleException(new ErrorException($error['message'], 500, $$error['level'], $$error['file'], $$error['line']));
+            self::handleException(new ErrorException($error['message'], 500, $error['level'], $error['file'], $error['line']));
         }
     }
     /**
@@ -149,7 +149,7 @@ class ExceptionHandler implements Throwable
 			$response = new CliResponse($exception);
     		$response->send();
 		} else {
-			$code = (in_array($exception->getCode(), self::$nonValidHttpCodes)) ? 500 : $exception->getCode();
+            $code = (in_array($exception->getCode(), self::$nonValidHttpCodes)) ? 500 : $exception->getCode();
 			$data = [];
 			$data['code'] = $code;
 			$data['status'] = \App::config('http.' . $code);
@@ -157,7 +157,7 @@ class ExceptionHandler implements Throwable
 			$data['file'] = $exception->getFile();
 			$data['line'] = $exception->getLine();
 			$data['trace'] = $exception->getTrace();
-			$response = new HttpResponse($code, \View::render('errors.error', $data));
+            $response = new HttpResponse($code, \View::render('errors.error', $data));
 			$response->send();			
 		}
     }
