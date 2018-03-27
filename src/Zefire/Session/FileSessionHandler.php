@@ -49,7 +49,9 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        $this->fileSystem->disk('sessions')->put($sessionId, '');
+        if (!$this->fileSystem->disk('sessions')->exists($sessionId)) {
+            $this->fileSystem->disk('sessions')->put($sessionId, '');            
+        }
         return $this->fileSystem->disk('sessions')->get($sessionId);
     }
     /**
