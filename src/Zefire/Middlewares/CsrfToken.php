@@ -55,42 +55,28 @@ class CsrfToken implements Middleware
 	/**
      * Pulls the token from the request.
      *
-     * @return array
+     * @return string
      */
 	protected function getToken()
 	{
-		$token = null;
 		if (($this->request->server('X-CSRF-TOKEN') != null)) {
-			$token['header'] = $this->request->server('X-CSRF-TOKEN');
+			return $this->request->server('X-CSRF-TOKEN');
 		}
 		$inputs = $this->request->input();		
 		if (isset($inputs['X-CSRF-TOKEN']) && $inputs['X-CSRF-TOKEN'] != '') {
-			$token['input'] = $inputs['X-CSRF-TOKEN'];
+			return $inputs['X-CSRF-TOKEN'];
 		}		
-		return $token;
+		return false;
 	}
 	/**
      * Matches token from request against session token.
      *
-     * @param  array  $token
-     * @return string
+     * @param  string $token
+     * @return bool
      */
 	protected function tokenMatch($token)
 	{
-		if (isset($token['header']) && $token['header'] != '') {
-			if ($token['header'] == \Session::get('XSRF-TOKEN')) {
-				$this->tokenSource = 'header';
-				return $token['header'];
-			}
-		}
-		if (isset($token['input']) && $token['input'] != '') {
-			if ($token['input'] == \Session::get('XSRF-TOKEN')) {
-				return $token['input'];
-			}
-		}
-		if ($token == null) {
-			return false;
-		}
+		return ($token == \Session::get('XSRF-TOKEN')) ? true : false;
 	}
 	/**
      * Checks if request is excluded from CSRF protection.
