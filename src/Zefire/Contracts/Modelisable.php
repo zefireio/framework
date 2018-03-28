@@ -105,6 +105,13 @@ interface Modelisable
      */
     public function get();
     /**
+     * Paginates a record set.
+     *
+     * @param  int $perPage
+     * @return \Zefire\Database\Collection
+     */
+    public function paginate(int $perPage);
+    /**
      * Defines which relations should be pulled with records.
      *
      * @param  mixed $relations

@@ -72,7 +72,10 @@ class Router
 	{
 		if (\App::runningMode() == 'http') {
 			$segments = $this->request->segments();
-			$matches = [];
+            foreach ($segments as $key => $value) {                
+                $segments[$key] = preg_replace('#\?(.*)#', '', $value);
+            }
+            $matches = [];
 			foreach ($data[strtolower($this->request->method())] as $key => $value) {
 				if (count($segments) == $value['segment_count']) {
 					$matched = [];

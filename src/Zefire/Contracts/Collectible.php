@@ -5,6 +5,14 @@ namespace Zefire\Contracts;
 interface Collectible
 {
     /**
+     * Build a pagination index.
+     *
+     * @param  int  $total
+     * @param  int  $pages
+     * @return void
+     */
+    public function setPagination($total, $pages);
+    /**
      * Creates pivot records to create relations between entities.
      *
      * @param  array  $ids

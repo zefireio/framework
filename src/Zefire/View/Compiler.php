@@ -33,6 +33,7 @@ class Compiler
 		'endRawPhp' 		=> '#@endphp#',
 		'include' 			=> '#@include\((.*)\)#',
 		'csrf' 				=> '#@csrf#',
+		'paginate' 			=> '#@paginate#',
 		'startForeachLoop' 	=> '#@foreach\((.*)(as)(.*)\)#',
 		'endForeachLoop' 	=> '#@endforeach#',
 		'startForLoop' 		=> '#@for\((.*)\)#',
@@ -65,9 +66,9 @@ class Compiler
      * @param  mixed  $data
      * @return string
      */
-	public function make($html, $data = false)
+	public function make($html, $data = null)
 	{
-		$this->data = $data;
+		$this->handleData($data);
 		$html = $this->section($html);		
 		$html = $this->code($html);
 		$html = $this->extends($html);
@@ -75,6 +76,7 @@ class Compiler
 		$html = $this->translate($html);
 		$html = $this->include($html);
 		$html = $this->csrf($html);
+		$html = $this->paginate($html);
 		$html = $this->comment($html);
 		$html = $this->startRawPhp($html);
 		$html = $this->endRawPhp($html);
@@ -92,6 +94,18 @@ class Compiler
 		$html = $this->endWhileLoop($html);
 		$html = $this->handleSpecialVar($html);		
 		return $html;
+	}
+
+	protected function handleData($data)
+	{
+		if ($this->data == null) {
+			$this->data = $data;
+		} else {
+			if (is_object($data)) {
+				$data = object_to_array($data);
+				$this->data = array_merge($this->data, $data);
+			}
+		}
 	}
 	/**
      * Finds all code special characters directives and repalces content with html entites.
@@ -229,6 +243,26 @@ class Compiler
 	protected function csrf($html)
 	{
 		return preg_replace($this->patterns['csrf'], '<input type="hidden" name="X-CSRF-TOKEN" value="'. \Session::get('XSRF-TOKEN') .'">', $html);
+	}
+	/**
+     * Finds all pagination directives and generates a pagination index.
+     *
+     * @param  string $html
+     * @return string
+     */
+	protected function paginate($html)
+	{
+		$string = '';
+		if (isset($this->data['pagination']) && $this->data['pagination'] != null) {
+			if ($this->data['pagination']->page_count > 1) {
+				$string .= '<nav aria-label="pagination"><ul class="pagination">';
+				foreach($this->data['pagination']->index as $key => $value) {
+					$string .= '<li class="page-item"><a class="page-link" href="' . $value . '">' . $key . '</a></li>';
+				}
+				$string .= '</ul></nav>';
+			}
+		}
+		return preg_replace($this->patterns['paginate'], $string, $html);
 	}	
 	/**
      * Starts a foreach loop php tag.

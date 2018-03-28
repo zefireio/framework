@@ -232,6 +232,35 @@ abstract class Model extends Database implements Modelisable
         return new Collection($this->model, parent::get());
     }
     /**
+     * Paginates a record set.
+     *
+     * @param  int $perPage
+     * @return \Zefire\Database\Collection
+     */
+    public function paginate(int $perPage)
+    {
+        $select = $this->select;
+        $count = $this->count();
+        $this->select = $select;
+        $inputs = (\Request::method() =='GET') ? \Request::input() : $inputs = [];
+        $current = (isset($inputs['page']) && $inputs['page'] != '') ? $inputs['page'] : 1;
+        $pages = $count / $perPage;
+        $this->limit = $perPage;
+        switch ($current) {
+            case 1:
+                break;
+            case 2:
+                $this->offset = $perPage;
+                break;
+            default:
+                $this->offset = ($current * $perPage) - ($perPage);
+                break;
+        }
+        $collection = new Collection($this->model, parent::get());
+        $collection->setPagination($count, $pages);
+        return $collection;
+    }
+    /**
      * Defines which relations should be pulled with records.
      *
      * @param  mixed $relations

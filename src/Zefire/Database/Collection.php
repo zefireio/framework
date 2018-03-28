@@ -49,6 +49,12 @@ class Collection implements Collectible
      */
     public $related = null;
     /**
+     * Stores pagination data.
+     * 
+     * @var \stdClass
+     */
+    public $pagination = null;    
+    /**
      *Creates a new collection instance.
      *
      * @param  string $model
@@ -67,6 +73,25 @@ class Collection implements Collectible
 		}
 		$this->count = count($this->items);
 	}
+    /**
+     * Build a pagination index.
+     *
+     * @param  int  $total
+     * @param  int  $pages
+     * @return void
+     */
+    public function setPagination($total, $pages)
+    {
+        $pagination = new \stdClass();
+        $pagination->total = $total;
+        $array = [];
+        for ($i = 1; $i <= $pages; $i++) {
+            $array[$i] = \Request::uri() . '?page=' . $i;
+        }
+        $pagination->index = $array;
+        $pagination->page_count = count($array);
+        $this->pagination = $pagination;
+    }
 	/**
      * Creates pivot records to create relations between entities.
      *
