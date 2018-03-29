@@ -123,7 +123,12 @@ class ExceptionHandler implements Throwable
     {
     	$error = error_get_last();
         if (!is_null($error) && self::isFatal($error['type'])) {
-            self::handleException(new ErrorException($error['message'], 500, $error['level'], $error['file'], $error['line']));
+            $type = (isset($error['type']) && $error['type'] != '') ? $error['type'] : 0;
+            $message = (isset($error['message']) && $error['message'] != '') ? $error['message'] : 'Unidentified error';
+            $level = (isset($error['level']) && $error['level'] != '') ? $error['level'] : $type;
+            $file = (isset($error['file']) && $error['file'] != '') ? $error['file'] : 'Could not identify filename';
+            $line = (isset($error['line']) && $error['line'] != '') ? $error['line'] : 'Could not identify line';
+            self::handleException(new ErrorException($message, 500, $level, $file, $line));
         }
     }
     /**

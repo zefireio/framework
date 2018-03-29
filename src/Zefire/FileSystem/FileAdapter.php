@@ -15,12 +15,16 @@ class FileAdapter implements Fillable
     /**
      * Mounts a disk.
      *
-     * @param  string $path
+     * @param  array $config
      * @return void
      */
-    public function mount($path)
+    public function mount(array $config)
     {
-        $this->path = $path;
+        if (isset($config['path']) && $config['path'] != '') {
+            $this->path = $config['path'];
+        } else {
+            throw new \Exception('Please define the "path" for your local storage.');
+        }        
     }
     /**
      * returns path.

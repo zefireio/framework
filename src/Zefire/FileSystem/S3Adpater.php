@@ -80,18 +80,31 @@ class S3Adapter implements Fillable, Connectable
     /**
      * Mounts a S3 bucket disk.
      *
-     * @param. string $key
-     * @param. string $secret
-     * @param. string $region
-     * @param. string $bucket
+     * @param  array $config
      * @return void
      */
-    public function mount($key, $secret, $region, $bucket)
+    public function mount(array $config)
     {
-        $this->key      = $this->encryption->encrypt($key);
-        $this->secret   = $this->encryption->encrypt($secret);
-        $this->region   = $region;
-        $this->bucket   = $bucket;
+        if (isset($config['key']) && $config['key'] != '') {
+            $this->key = $this->encryption->encrypt($config['key']);    
+        } else {
+            throw new \Exception('Please define the "key" for your AWS S3 connection.');
+        }
+        if (isset($config['secret']) && $config['secret'] != '') {
+            $this->secret = $this->encryption->encrypt($config['secret']);    
+        } else {
+            throw new \Exception('Please define the "secret" for your AWS S3 connection.');
+        }
+        if (isset($config['region']) && $config['region'] != '') {
+            $this->region = $config['region'];    
+        } else {
+            throw new \Exception('Please define the "region" for your AWS S3 connection.');
+        }
+        if (isset($config['bucket']) && $config['bucket'] != '') {
+            $this->bucket = $config['bucket'];    
+        } else {
+            throw new \Exception('Please define the "bucket" for your AWS S3 connection.');
+        }
         $this->connect();
     }
     /**
