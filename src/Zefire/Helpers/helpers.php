@@ -28,6 +28,17 @@ if (!function_exists('make')) {
     }
 }
 /**
+ * Generates a CSRF Token if it doesn't exist.
+ *
+ * @param  string $class
+ * @return object
+ */
+if (!function_exists('csrf')) {
+    function csrf() {
+        return \App::csrfToken();
+    }
+}
+/**
  * Boots a model.
  *
  * @param  string $model

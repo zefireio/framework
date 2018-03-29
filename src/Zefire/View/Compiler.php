@@ -242,7 +242,7 @@ class Compiler
      */
 	protected function csrf($html)
 	{
-		return preg_replace($this->patterns['csrf'], '<input type="hidden" name="X-CSRF-TOKEN" value="'. \Session::get('XSRF-TOKEN') .'">', $html);
+		return preg_replace($this->patterns['csrf'], '<input type="hidden" name="X-CSRF-TOKEN" value="'. csrf() .'">', $html);
 	}
 	/**
      * Finds all pagination directives and generates a pagination index.
