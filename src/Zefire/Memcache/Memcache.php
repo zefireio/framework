@@ -106,12 +106,11 @@ class Memcache implements Storable, Connectable
                 }                
             }
         }
-        if (!$this->memcache->getServerList()) {
-            $servers = explode(',', $config['servers']);
-            foreach ($servers as $server) {
-                $parts = explode(':', $server);
-                $this->memcache->addServer($parts[0], $parts[1]);
-            }
+        $servers = explode(',', $config['servers']);
+        foreach ($servers as $server) {
+            $this->serverPool[] = $server;
+            $parts = explode(':', $server);
+            $this->memcache->addServer($parts[0], $parts[1]);
         }
     }
     /**
