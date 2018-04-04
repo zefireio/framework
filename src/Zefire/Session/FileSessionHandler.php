@@ -19,7 +19,7 @@ class FileSessionHandler implements \SessionHandlerInterface
      */
 	public function __construct(FileSystem $fileSystem)
     {
-        $this->fileSystem = $fileSystem;        
+        $this->fileSystem = $fileSystem;
     }
     /**
      * Returns the session path.

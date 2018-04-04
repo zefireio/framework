@@ -4,10 +4,12 @@ namespace Zefire\Session;
 
 use Zefire\Contracts\Storable;
 use Zefire\Helpers\Arr;
+use Zefire\Core\Serializable;
 
 class Session implements Storable
 {
-	/**
+	use Serializable;
+    /**
      * Stores the session driver instance.
      *
      * @var object
@@ -34,7 +36,7 @@ class Session implements Storable
                 session_save_path($this->driver->path());    
             }    
         }
-        session_start();        
+        session_start();
     }
     /**
      * Returns all content from session.

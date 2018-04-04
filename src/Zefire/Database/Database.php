@@ -908,9 +908,9 @@ abstract class Database implements Rdbms
     {
         $data = [
            'created_at' => date('Y-m-d H:i:s'),
-           'created_by' => \Session::get('user.id'),
+           // 'created_by' => \Session::get('user.id'),
            'updated_at' => date('Y-m-d H:i:s'),
-           'updated_by' => \Session::get('user.id')
+           // 'updated_by' => \Session::get('user.id')
         ];
         return array_merge($array, $data);
     }
@@ -924,7 +924,7 @@ abstract class Database implements Rdbms
     {
         $data = [
            'updated_at' => date('Y-m-d H:i:s'),
-           'updated_by' => \Session::get('user.id'),
+           // 'updated_by' => \Session::get('user.id'),
         ];
         return array_merge($array, $data);
     }
@@ -938,7 +938,7 @@ abstract class Database implements Rdbms
     {
         $data = [
            'deleted_at' => date('Y-m-d H:i:s'),
-           'deleted_by' => \Session::get('user.id'),
+           // 'deleted_by' => \Session::get('user.id'),
         ];
         return array_merge($array, $data);
     }
@@ -953,7 +953,7 @@ abstract class Database implements Rdbms
     {
         $data = [
            'updated_at' => date('Y-m-d H:i:s'),
-           'updated_by' => \Session::get('user.id'),
+           // 'updated_by' => \Session::get('user.id'),
            'deleted_at' => null,
            'deleted_by' => null,
         ];

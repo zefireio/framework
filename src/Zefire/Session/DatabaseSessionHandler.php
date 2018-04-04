@@ -2,25 +2,35 @@
 
 namespace Zefire\Session;
 
-use Zefire\Memcache\Memcache;
+// use Zefire\Core\Serializable;
+// use Zefire\Contracts\Connectable;
 
-class MemcacheSessionHandler implements \SessionHandlerInterface
+class DatabaseSessionHandler implements \SessionHandlerInterface
 {
-	/**
-     * Stores a memcache instance.
-     *
-     * @var \Zefire\Memcache\Memcache
-     */
-    protected $memcache;
+	// use Serializable;
     /**
-     * Creates a new transport instance.
+     * Stores a DB instance.
      *
-     * @param  \Zefire\Memcache\Memcache
+     * @var \Zefire\Database\DB
+     */
+    protected $db;
+    /**
+     * Creates a new database session handler instance.
+     *
      * @return void
      */
-    public function __construct(Memcache $memcache)
+    public function __construct()
     {
-        $this->memcache = $memcache;        
+        $this->connect();
+    }
+    /**
+     * Connect to memcache server.
+     *
+     * @return void
+     */
+    public function connect()
+    {
+        $this->db = \App::make('Zefire\Database\DB');
     }
     /**
      * Open session save handler callback.
@@ -50,10 +60,12 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        if (!$this->memcache->exists($sessionId)) {
-            $this->memcache->set($sessionId, '', \App::config('session.life'));
+        $session = $this->db->connection('mysql1')->table('session')->where('id', '=', $sessionId)->first();
+        if (!isset($session->data)) {
+            $this->db->insert(['id' => $sessionId, 'data' => '']);
+            $session = $this->db->where('id', '=', $sessionId)->first();
         }
-        return $this->memcache->get($sessionId);        
+        return $session->data;
     }
     /**
      * Write session save handler callback.
@@ -64,7 +76,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $this->memcache->set($sessionId, $data, \App::config('session.life'));
+        $this->db->where('id', '=', $sessionId)->update(['data' => $data]);
         return true;
     }
     /**
@@ -75,7 +87,7 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $this->memcache->forget($sessionId);
+        $this->db->where('id', '=', $sessionId)->delete();
     }
     /**
      * Garbage collection session save handler callback.
@@ -85,6 +97,6 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function gc($lifetime)
     {
-        return true;
+        $this->db->connection('mysql1')->raw("DELETE FROM session WHERE updated_at < DATE_SUB(NOW(), INTERVAL :ttl SECOND)", ['ttl' => \App::config('session.life')]);
     }
 }

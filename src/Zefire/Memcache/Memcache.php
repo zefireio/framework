@@ -28,7 +28,7 @@ class Memcache implements Storable, Connectable
      */
 	public function __construct()
     {
-        $this->connect();
+        $this->connect();        
     }
     /**
      * Connect to memcache server.

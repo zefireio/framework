@@ -4,9 +4,11 @@ namespace Zefire\Database;
 
 use Zefire\Database\Database;
 use Zefire\Contracts\Query;
+use Zefire\Core\Serializable;
 
 class DB extends Database implements Query
 {
+    use Serializable;
     /**
      * Stores the connection name.
      *
