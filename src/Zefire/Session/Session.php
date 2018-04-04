@@ -21,11 +21,7 @@ class Session implements Storable
 	public function __construct()
     {
         if (\App::config('session.driver') != 'php') {
-            try {
-                $this->driver = \App::make(\App::config('session.driver'));
-            } catch (\Exception $e) {
-                $this->driver = \App::make('Zefire\Session\FileSessionHandler');
-            }
+            $this->driver = \App::make(\App::config('session.driver'));
             session_set_save_handler(
                 array($this->driver, 'open'),
                 array($this->driver, 'close'),
@@ -35,6 +31,7 @@ class Session implements Storable
                 array($this->driver, 'gc')
             );
             if ($this->driver instanceOf Zefire\Session\FileSessionHandler) {
+                echo 'haha';
                 session_save_path(\App::sessionPath());    
             }    
         }
