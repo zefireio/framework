@@ -20,20 +20,24 @@ class Session implements Storable
      */
 	public function __construct()
     {
-        try {
-            $this->driver = \App::make(\App::config('session.driver'));
-        } catch (\Exception $e) {
-            $this->driver = \App::make('Zefire\Session\FileSessionHandler');
+        if (\App::config('session.driver') != 'php') {
+            try {
+                $this->driver = \App::make(\App::config('session.driver'));
+            } catch (\Exception $e) {
+                $this->driver = \App::make('Zefire\Session\FileSessionHandler');
+            }
+            session_set_save_handler(
+                array($this->driver, 'open'),
+                array($this->driver, 'close'),
+                array($this->driver, 'read'),
+                array($this->driver, 'write'),
+                array($this->driver, 'destroy'),
+                array($this->driver, 'gc')
+            );
+            if ($this->driver instanceOf Zefire\Session\FileSessionHandler) {
+                session_save_path(\App::sessionPath());    
+            }    
         }
-        session_set_save_handler(
-    		array($this->driver, 'open'),
-    		array($this->driver, 'close'),
-    		array($this->driver, 'read'),
-    		array($this->driver, 'write'),
-    		array($this->driver, 'destroy'),
-    		array($this->driver, 'gc')
-    	);
-        session_save_path(\App::sessionPath());
         session_start();        
     }
     /**
