@@ -35,7 +35,7 @@ if (!function_exists('make')) {
  */
 if (!function_exists('csrf')) {
     function csrf() {
-        return \App::csrfToken();
+        return \Session::get('XSRF-TOKEN');
     }
 }
 /**

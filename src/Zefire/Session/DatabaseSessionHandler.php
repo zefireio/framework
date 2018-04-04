@@ -63,7 +63,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
         $session = $this->db->connection('mysql1')->table('session')->where('id', '=', $sessionId)->first();
         if (!isset($session->data)) {
             $this->db->insert(['id' => $sessionId, 'data' => '']);
-            $session = $this->db->where('id', '=', $sessionId)->first();
+            $session = $this->db->connection('mysql1')->table('session')->where('id', '=', $sessionId)->first();
         }
         return $session->data;
     }
