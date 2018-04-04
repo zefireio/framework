@@ -19,11 +19,7 @@ class Queue implements Queueable
      */
     public function __construct()
     {
-        try {
-            $this->driver = \App::make(\App::config('queueing.driver'));
-        } catch (\Exception $e) {
-            $this->driver = \App::make(\Zefire\Queue\PheanstalkHandler::class);
-        }
+        $this->driver = \App::make(\App::config('queueing.driver'));
     }
     /**
      * Pushes a job on a queue.

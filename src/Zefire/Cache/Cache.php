@@ -19,11 +19,7 @@ class Cache implements Storable
      */
     public function __construct()
     {
-        try {
-            $this->driver = \App::make(\App::config('cache.driver'));
-        } catch (\Exception $e) {
-            $this->driver = \App::make('Zefire\Memcache\Memcache');
-        }
+        $this->driver = \App::make(\App::config('cache.driver'));        
     }
     /**
      * Sets a new entry into cache.

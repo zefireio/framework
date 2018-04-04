@@ -129,11 +129,11 @@ class Memcache implements Storable, Connectable
      * Checks if a value exists in memcache.
      *
      * @param  string $key
-     * @return int
+     * @return bool
      */
     public function exists($key)
     {
-        return ($this->memcache->get($key)) ? 1 : 0;
+        return ($this->memcache->get($key)) ? true : false;
     }
     /**
      * Gets a value from memcache.

@@ -39,13 +39,8 @@ class FileSystem implements Fillable
     {
         $config = \App::config('file');
         foreach ($config['disks'] as $key => $disk) {
-            try {
-                $this->store[$key] = \App::make($disk['driver']);
-                $this->store[$key]->mount($disk['config']);
-            } catch (\Exception $e) {
-                $this->store[$key] = \App::make('Zefire\FileSystem\FileAdapter');
-                $this->store[$key]->mount(['path' => '/tmp']);
-            }
+            $this->store[$key] = \App::make($disk['driver']);
+            $this->store[$key]->mount($disk['config']);            
         }        
         $this->disk($config['default']);
     }

@@ -22,6 +22,15 @@ class FileSessionHandler implements \SessionHandlerInterface
         $this->fileSystem = $fileSystem;        
     }
     /**
+     * Returns the session path.
+     *
+     * @return string
+     */
+    public function path()
+    {
+        return $this->fileSystem->disk('sessions')->path();
+    }
+    /**
      * Open session save handler callback.
      *
      * @param  string $savePath

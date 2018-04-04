@@ -50,13 +50,11 @@ class MemcacheSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        $session = $this->memcache->get($sessionId);
-        if ($session) {
-            return $session;
-        } else {
+        $session = $this->memcache->exists($sessionId);
+        if (!$this->memcache->exists($sessionId)) {
             $this->memcache->set($sessionId, '', \App::config('session.life'));
-            return $this->memcache->get($sessionId);
-        }        
+        }
+        return $this->memcache->get($sessionId);        
     }
     /**
      * Write session save handler callback.

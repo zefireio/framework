@@ -30,9 +30,8 @@ class Session implements Storable
                 array($this->driver, 'destroy'),
                 array($this->driver, 'gc')
             );
-            if ($this->driver instanceOf Zefire\Session\FileSessionHandler) {
-                echo 'haha';
-                session_save_path(\App::sessionPath());    
+            if ($this->driver instanceOf \Zefire\Session\FileSessionHandler) {
+                session_save_path($this->driver->path());    
             }    
         }
         session_start();        

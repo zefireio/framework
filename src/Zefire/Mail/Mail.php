@@ -65,11 +65,7 @@ class Mail
      */
 	public function __construct()
     {
-        try {
-            $this->driver = \App::make(\App::config('mail.mailgun.driver'));
-        } catch (\Exception $e) {
-            $this->driver = \App::make('Zefire\Mail\MailGunAdapter');
-        }        
+        $this->driver = \App::make(\App::config('mail.mailgun.driver'));        
     }
     /**
      * Adds a sender.
