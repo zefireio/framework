@@ -140,7 +140,7 @@ abstract class Database implements Rdbms
     public function getSqlMode()
     {
         $this->prepare($this->adapter->getSqlMode());
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->fetch(PDO::FETCH_OBJ);
     }
     /**
@@ -152,7 +152,7 @@ abstract class Database implements Rdbms
     public function setSqlMode(array $modes = [])
     {
         $this->prepare($this->adapter->setSqlMode($modes));
-        $this->statement->execute();        
+        $this->execute();
     }
     /**
      * Gets the desired SQL adapter.
@@ -171,7 +171,7 @@ abstract class Database implements Rdbms
     public function attributes()
     {
         $this->prepare($this->adapter->attributes($this->table));
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->fetchAll(PDO::FETCH_OBJ);
     }
     /**
@@ -424,7 +424,7 @@ abstract class Database implements Rdbms
         foreach ($data as $key => $value) {
             $this->bind($key, $value);
         }
-        $this->statement->execute();
+        $this->execute();
         return $this->lastInsertId();
     }
     /**
@@ -449,7 +449,7 @@ abstract class Database implements Rdbms
         foreach ($data as $key => $value) {
             $this->bind($key, $value);
         }
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->rowCount();
     }
     /**
@@ -475,7 +475,7 @@ abstract class Database implements Rdbms
         foreach ($data as $key => $value) {
             $this->bind($key, $value);
         }
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->rowCount();
     }
     /**
@@ -501,7 +501,7 @@ abstract class Database implements Rdbms
         foreach ($data as $key => $value) {
             $this->bind($key, $value);
         }
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->rowCount();
     }
     /**
@@ -521,7 +521,7 @@ abstract class Database implements Rdbms
                 $this->bind($key, $value['value']);
             }
         }
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->rowCount();
     }
     /**
@@ -534,7 +534,7 @@ abstract class Database implements Rdbms
     {
         $this->prepare($this->adapter->find($this->table));
         $this->bind('id', $id);
-        $this->statement->execute();
+        $this->execute();
         return $this->statement->fetch(PDO::FETCH_OBJ);
     }
     /**
@@ -693,7 +693,7 @@ abstract class Database implements Rdbms
                 $this->bind($key, $value);
             }    
         }
-        $this->statement->execute();
+        $this->execute();
         switch ($case) {
             case 'lastInsertId':
                 return $this->lastInsertId();
@@ -767,7 +767,7 @@ abstract class Database implements Rdbms
         if (\App::config('database.' . $this->connection . '.strict')) {
             $this->setSqlMode(\App::config('database.' . $this->connection . '.strict'));
         }
-        $this->statement->execute();
+        $this->execute();
     }
     /**
      * Prepares a SQL statement.
@@ -811,6 +811,16 @@ abstract class Database implements Rdbms
         $this->bindings[$param] = $value;
     }
     /**
+     * Executes a PDO statement.
+     *
+     * @return void
+     */
+    protected function execute()
+    {
+        $this->statement->execute();
+        $this->dispatcher->now('db-query', ['statement' => $this->statement->queryString, 'bindings' => json_encode($this->bindings)]);
+    }
+    /**
      * Resolves a connection and returns a PDO instance.
      *
      * @param  string $connectionName
@@ -845,14 +855,7 @@ abstract class Database implements Rdbms
                             PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION sql_mode='" . $sqlModes . "'"
                         ]
                     );
-                    $this->dispatcher->now(
-                        'db-connect',
-                        [
-                            'status' => ($pdo) ? 'Success:' : 'Failure:',
-                            'dsn' => $dsn,
-                            'connection' => $connectionName
-                        ]
-                    );
+                    $this->dispatcher->queue('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => 'sql_mode: ' . $sqlModes]);
                     break;
                 case 'pgsql':
                     if ($connection['host'] == '' || $connection['port'] == '' || $connection['database'] == '') {
@@ -864,14 +867,7 @@ abstract class Database implements Rdbms
                         $connection['username'],
                         $connection['password']
                     );
-                    $this->dispatcher->now(
-                        'db-connect',
-                        [
-                            'status' => ($pdo) ? 'Success:' : 'Failure:',
-                            'dsn' => $dsn,
-                            'connection' => $connectionName
-                        ]
-                    );
+                    $this->dispatcher->queue('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => null]);
                     break;
                 case 'sqlite':
                     $dsn = 'sqlite::memory:';
@@ -883,14 +879,7 @@ abstract class Database implements Rdbms
                             PDO::ATTR_PERSISTENT => true
                         ]
                     );
-                    $this->dispatcher->now(
-                        'db-connect',
-                        [
-                            'status' => ($pdo) ? 'Success:' : 'Failure:',
-                            'dsn' => $dsn,
-                            'connection' => $connectionName
-                        ]
-                    );
+                    $this->dispatcher->queue('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => null]);
                     break;
             }
             return $pdo;    
@@ -908,9 +897,9 @@ abstract class Database implements Rdbms
     {
         $data = [
            'created_at' => date('Y-m-d H:i:s'),
-           // 'created_by' => \Session::get('user.id'),
+           'created_by' => (!$this->usesDatabaseSessionHandler()) ? \Session::get('user.id') : null,
            'updated_at' => date('Y-m-d H:i:s'),
-           // 'updated_by' => \Session::get('user.id')
+           'updated_by' => (!$this->usesDatabaseSessionHandler()) ? \Session::get('user.id') : null
         ];
         return array_merge($array, $data);
     }
@@ -924,7 +913,7 @@ abstract class Database implements Rdbms
     {
         $data = [
            'updated_at' => date('Y-m-d H:i:s'),
-           // 'updated_by' => \Session::get('user.id'),
+           'updated_by' => (!$this->usesDatabaseSessionHandler()) ? \Session::get('user.id') : null
         ];
         return array_merge($array, $data);
     }
@@ -938,7 +927,7 @@ abstract class Database implements Rdbms
     {
         $data = [
            'deleted_at' => date('Y-m-d H:i:s'),
-           // 'deleted_by' => \Session::get('user.id'),
+           'deleted_by' => (!$this->usesDatabaseSessionHandler()) ? \Session::get('user.id') : null
         ];
         return array_merge($array, $data);
     }
@@ -953,10 +942,20 @@ abstract class Database implements Rdbms
     {
         $data = [
            'updated_at' => date('Y-m-d H:i:s'),
-           // 'updated_by' => \Session::get('user.id'),
+           'updated_by' => (!$this->usesDatabaseSessionHandler()) ? \Session::get('user.id') : null,
            'deleted_at' => null,
            'deleted_by' => null,
         ];
         return array_merge($array, $data);
+    }
+    /**
+     * Checks if the application was configured to
+     * use the database session handler.
+     *
+     * @return bool
+     */
+    protected function usesDatabaseSessionHandler()
+    {
+        return (\App::config('session.driver') == 'Zefire\Session\DatabaseSessionHandler') ? true : false;
     }
 }

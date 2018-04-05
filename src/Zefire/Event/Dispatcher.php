@@ -53,7 +53,7 @@ class Dispatcher
      * @param  string $queue
      * @return void
      */
-    public function queue($name, $args = [], $queue = 'default')
+    public function queue($name, $args = [], $queue = 'events')
     {
         if (isset($this->events[$name])) {
             $this->queue->push($this->events[$name], $args, $queue);
@@ -70,7 +70,7 @@ class Dispatcher
      * @param  string $queue
      * @return void
      */
-    public function later($name, $delay, $args = [] , $queue = 'default')
+    public function later($name, $delay, $args = [] , $queue = 'events')
     {
         if (isset($this->events[$name])) {
             $this->queue->later($this->events[$name], $delay, $args, $queue);

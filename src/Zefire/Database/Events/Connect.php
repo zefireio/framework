@@ -27,13 +27,24 @@ class Connect
      *
      * @param  string $status
      * @param  string $dsn
-     * @param  string $connection
+     * @param  string $options
      * @return void
      */
-	public function handle($status, $dsn, $connection)
+	public function handle($status, $dsn, $options = false)
     {
         if (\App::debugMode() === true) {
-        	$this->logger->push($status . ' Connected to ' . $dsn . ' using ' . $connection, 'db');	
+        	if ($status) {
+                $this->logger->push('Connected to ' . $dsn, 'db');
+                if ($options) {
+                    $this->logger->push('Options: ' . $options, 'db');
+                }
+            } else {
+                $this->logger->push('Failed to connect to ' . $dsn, 'db');
+                if ($options) {
+                    $this->logger->push('Options: ' . $options, 'db');
+                }
+            }
+            
         }
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Zefire\Authentication;
 
-use Zefire\Contracts\Connectable;
 use Zefire\Factory\Factory;
+use Zefire\Event\Dispatcher;
 
-class Authentication implements Connectable
+class Authentication
 {
     /**
      * Holds a Factory instance.
@@ -20,14 +20,21 @@ class Authentication implements Connectable
      */
     protected $provider;
     /**
+     * Stores a dispatcher instance.
+     *
+     * @var \Zefire\Event\Dispatcher
+     */
+    protected $dispatcher;
+    /**
      * Create a new Authentication instance.
      *
      * @param. \Zefire\Factory\Factory
      * @return void
      */
-    public function __construct(Factory $factory)
+    public function __construct(Factory $factory, Dispatcher $dispatcher)
     {
         $this->factory = $factory;        
+        $this->dispatcher = $dispatcher;
     }
     /**
      * Saves factory property on serialization.
@@ -36,7 +43,7 @@ class Authentication implements Connectable
      */
     public function __sleep()
     {
-        return array('factory');
+        return array('factory', 'dispatcher');
     }
     /**
      * Gets a new instance of the provider
@@ -46,7 +53,7 @@ class Authentication implements Connectable
      */
     public function __wakeup()
     {
-        $this->getProvider();
+        $this->getProvider();        
     }
     /**
      * Gets a new instance of the provider.
@@ -68,10 +75,12 @@ class Authentication implements Connectable
     public function login($email, $password)
     {
         $user = $this->provider->where('email', '=', $email)->where('password', '=', $password)->first();
-        if ($user->id != null) {
+        if ($user->hasResults()) {
             \Session::set('user', $user);
+            $this->dispatcher->queue('app-auth', ['status' => true, 'user' => $user->email]);
             return true;
         } else {
+            $this->dispatcher->queue('app-auth', ['status' => false, 'user' => $email]);
             return false;
         }
     }
@@ -100,7 +109,10 @@ class Authentication implements Connectable
      */
     public function logout()
     {
-        return \Session::forget('user');
+        $user = \Session::get('user');
+        $logout = \Session::forget('user');
+        $this->dispatcher->queue('app-logout', ['user' => $user->email]);
+        return $logout;
     }
     /**
      * Api authentication based on token

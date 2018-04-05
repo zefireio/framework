@@ -95,7 +95,9 @@ class Application
         // Set CSRF Token
         $this->csrfToken();
         // Set kernel load time to session.
-        \Session::set('kernel', \App::runtime());
+        \Session::set('kernel_runtime', \App::runtime());
+        // Dispatching kernel loaded event
+        \Dispatcher::queue('app-message', ['message' => 'Request runtime ' . \Session::get('kernel_runtime')]);
         return $this;
     }
     /**
