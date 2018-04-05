@@ -37,7 +37,7 @@ class Memcache implements Storable, Connectable
      */
     public function connect()
     {
-        $this->memcache = new \Memcached('memcached_pool');
+        $this->memcache = new \Memcached();
         $config = (\App::config('memcache'));
         if (isset($config['options']) && is_array($config['options']) && !empty($config['options'])) {
             foreach ($config['options'] as $key => $value) {
