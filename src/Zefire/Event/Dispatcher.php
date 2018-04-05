@@ -41,8 +41,6 @@ class Dispatcher
         if (isset($this->events[$name])) {
             $event = \App::make($this->events[$name]);
             return call_user_func_array([$event, 'handle'], $args);
-        } else {
-            throw new \Exception('Could not find event in container');
         }
     }
     /**
@@ -57,8 +55,6 @@ class Dispatcher
     {
         if (isset($this->events[$name])) {
             $this->queue->push($this->events[$name], $args, $queue);
-        } else {
-            throw new \Exception('Could not find event in container');
         }
     }
     /**
@@ -74,8 +70,6 @@ class Dispatcher
     {
         if (isset($this->events[$name])) {
             $this->queue->later($this->events[$name], $delay, $args, $queue);
-        } else {
-            throw new \Exception('Could not find event in container');
         }
     }
     /**
