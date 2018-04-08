@@ -57,19 +57,23 @@ class PheanstalkHandler
             $delay = $data->delay - time();
             if ($delay > 0) {
                 $this->client->release($job, 1024, $delay);
+                \Dispatcher::now('queue-push', ['queue' => $queue, 'job' => $job]);
 			} else {
                 $attempts = 0;
                 do {                    
                     $status = $this->process($data);                    
                     if ($status) {
                         $this->client->delete($job);
+                        \Dispatcher::now('queue-job-status', ['queue' => $queue, 'job' => $job, 'status' => 1]);
                         break;
                     } else {
                         $attempts++;
+                        \Dispatcher::now('queue-job-status', ['queue' => $queue, 'job' => $job, 'status' => 2]);
                     }                    
                 } while($attempts < $data->tries);
                 if ($attempts == $data->tries) {
                     $this->client->bury($job);
+                    \Dispatcher::now('queue-job-status', ['queue' => $queue, 'job' => $job, 'status' => 3]);
                 }
 			}			
         }

@@ -19,7 +19,8 @@ class Log
     protected $logFile = [
         'error' => 'error.log',
         'app'   => 'app.log',
-        'db'    => 'db.log'
+        'db'    => 'db.log',
+        'queue' => 'queue.log'
     ];
     /**
      * Creates a new log instance.

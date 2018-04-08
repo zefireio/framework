@@ -818,7 +818,7 @@ abstract class Database implements Rdbms
     protected function execute()
     {
         $this->statement->execute();
-        $this->dispatcher->now('db-query', ['statement' => $this->statement->queryString, 'bindings' => json_encode($this->bindings)]);
+        $this->dispatcher->queue('db-query', ['statement' => $this->statement->queryString, 'bindings' => json_encode($this->bindings)]);
     }
     /**
      * Resolves a connection and returns a PDO instance.

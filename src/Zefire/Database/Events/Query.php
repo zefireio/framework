@@ -33,7 +33,10 @@ class Query
     {
         if (\App::debugMode() === true) {
         	$this->logger->push('New query: ' . $statement, 'db');
-            $this->logger->push('Query bindings: ' . $bindings, 'db');
+            $data = json_decode($bindings, true);
+            if (!empty($data)) {
+                $this->logger->push('Query bindings: ' . $bindings, 'db');    
+            }            
         }
     }
 }

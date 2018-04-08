@@ -12,7 +12,7 @@ class Queue implements Queueable
      * @var mixed
      */
 	protected $driver;
-	/**
+    /**
      * Creates a new queue instance.
      *
      * @return void
@@ -20,6 +20,8 @@ class Queue implements Queueable
     public function __construct()
     {
         $this->driver = \App::make(\App::config('queueing.driver'));
+        // $this->dispatcher = \App::make(Dispatcher::class);
+        // dump($this);
     }
     /**
      * Pushes a job on a queue.
@@ -32,6 +34,7 @@ class Queue implements Queueable
 	public function push(string $job, array $args, string $queue = 'default')
 	{
 		$this->driver->push($this->prepareJob($job, 0, $args), $queue);
+        \Dispatcher::now('queue-push', ['queue' => $queue, 'job' => $job]);
 	}
 	/**
      * Pushes a job on a queue to be executed at later time.
@@ -45,6 +48,7 @@ class Queue implements Queueable
 	public function later(string $job, int $delay, array $args, string $queue = 'default')
 	{
 		$this->driver->push($this->prepareJob($job, $delay, $args), $queue);
+        \Dispatcher::now('queue-push', ['queue' => $queue, 'job' => $job]);
 	}
 	/**
      * Listens for jobs released on a queue.
