@@ -40,13 +40,7 @@ class Redis implements Storable, Connectable
      */
     public function connect()
     {
-        $config = \App::config('redis');
-        $explode = explode(':', $config['server']);
-        $this->predis = new Client([
-            'scheme' => $config['scheme'],
-            'host'   => $explode[0],
-            'port'   => $explode[1],
-        ]);
+        $this->predis = new Client(\App::config('redis.connection'));
     }
     /**
      * Set a value into redis.
