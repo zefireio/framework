@@ -123,7 +123,7 @@ class Redis implements Storable, Connectable
         return $array;
     }
     /**
-     * Pushes a job onto a queue.
+     * Pushes a job on the end of a queue.
      *
      * @param  string $queue
      * @param  string $job
@@ -137,11 +137,85 @@ class Redis implements Storable, Connectable
      * Pops a job from a queue.
      *
      * @param  string  $queue
+     * @param  string  $processing_queue
      * @param  integer $wait
      * @return string
      */
-    public function pop($queue, $wait = 10)
+    public function pop($queue, $processing_queue, $wait = 10)
     {
-        return $this->predis->blpop($queue, $wait);
+        return $this->predis->brpoplpush($queue, $processing_queue, $wait);
+    }
+    /**
+     * Deletes successful jobs from the queue.
+     *
+     * @param  string  $queue
+     * @param  string  $job
+     * @return string
+     */
+    public function success($queue, $job)
+    {
+        return $this->predis->lrem($queue, 1, $job);
+    }
+    /**
+     * Deletes failed jobs from the queue
+     * and pushes them onto the failed jobs queue.
+     *
+     * @param  string  $queue
+     * @param  string  $job
+     * @return string
+     */
+    public function failed($queue, $job)
+    {
+        $this->predis->lpush($queue, $job);
+        $this->predis->lrem($queue);
+    }
+    /**
+     * Flushes a queue.
+     *
+     * @param  string  $queue
+     * @return void
+     */
+    public function flushQueue($queue)
+    {
+        $this->predis->del($queue);
+    }
+    /**
+     * Json decodes a job and returns an object to process it.
+     *
+     * @param  string  $job
+     * @return \stdClass
+     */
+    public function parseJob($job)
+    {
+        return json_decode($job);
+    }
+    /**
+     * Publish a message to a channel.
+     *
+     * @param  string  $channel
+     * @param  string  $message
+     * @return void
+     */
+    public function publish($channel, $message)
+    {
+        $this->client->publish($channel, serialize($message));
+    }
+    /**
+     * Subscribe a handler to a channel.
+     *
+     * @param  string   $channel
+     * @param  callable $handler
+     * @return void
+     */
+    public function subscribe($channel, callable $handler)
+    {
+        $loop = $this->predis->pubSubLoop();
+        $loop->subscribe($channel);
+        foreach ($loop as $message) {
+            if ($message->kind === 'message') {
+                call_user_func($handler, unserialize($message->payload));
+            }
+        }
+        unset($loop);
     }
 }

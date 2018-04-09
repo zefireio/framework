@@ -108,6 +108,7 @@ class PheanstalkHandler
         try {
             $args = json_decode($job->args, true);
             $job = \Factory::make($job->name);
+            \Dispatcher::now('queue-process', ['job' => $job->name]);
             $dependencies = \App::resolveMethodDependencies($job, 'handle');
             $dependencies = array_merge($args, $dependencies);
             call_user_func_array(array($job, 'handle'), $dependencies);

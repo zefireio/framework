@@ -20,8 +20,6 @@ class Queue implements Queueable
     public function __construct()
     {
         $this->driver = \App::make(\App::config('queueing.driver'));
-        // $this->dispatcher = \App::make(Dispatcher::class);
-        // dump($this);
     }
     /**
      * Pushes a job on a queue.

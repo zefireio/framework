@@ -32,12 +32,12 @@ class JobStatus
      */
 	public function handle($queue, $job, $status)
     {
-        if (is_array($job)) {
-            $job = json_decode($job[1]);
-        }
         if (is_object($job)) {
             $job = json_decode($job->getData());
         }
+        if (is_string($job)) {
+            $job = json_decode($job);
+        }        
         switch ($status) {
             case 1:
                 $this->logger->push('Successfuly processed "' . $job->name . '" from "' . $queue . '" queue ', 'queue');

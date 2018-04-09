@@ -52,18 +52,19 @@ class RedisHandler
     public function listen($queue)
     {
         while (true) {
-            $job = $this->client->pop($queue);
+            $job = $this->client->pop($queue, $queue . '-processing', \App::config('queueing.wait'));
             if ($job != null) {
-                $data = json_decode($job[1]);
+                $data = $this->client->parseJob($job);
                 $delay = $data->delay - time();
                 if ($delay > 0) {
-                    $this->redis->push($queue, json_encode($data));
+                    $this->client->push($queue, json_encode($data));
                     \Dispatcher::now('queue-push', ['queue' => $queue, 'job' => $job]);
                 } else {
                     $attempts = 0;
                     do {                    
                         $status = $this->process($data);                    
                         if ($status) {
+                            $this->client->success($queue, json_encode($data));
                             \Dispatcher::now('queue-job-status', ['queue' => $queue, 'job' => $job, 'status' => 1]);
                             break;
                         } else {
@@ -73,6 +74,7 @@ class RedisHandler
                     } while($attempts < $data->tries);
                     if ($attempts == $data->tries) {
                         \Dispatcher::now('queue-job-status', ['queue' => $queue, 'job' => $job, 'status' => 3]);
+                        $this->client->failed($queue . '-failed', json_encode($data));
                     }
                 }
             }			
@@ -86,7 +88,7 @@ class RedisHandler
      */
     public function clearQueue($queue = 'default')
     {   
-        //
+        $this->redis->flushQueue($queue);
     }
     /**
      * Processes a job released on a queue.
