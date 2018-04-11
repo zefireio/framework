@@ -32,14 +32,15 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
         $this->checkSessionTable();
     }
     /**
-     * Connect to memcache server.
+     * Connect to db server.
      *
+     * @param  string $connection
      * @return void
      */
     public function connect($connection)
     {
         $this->db = \App::make('Zefire\Database\DB');
-        $this->db->connection($connection);
+        $this->db->connection($connection);        
     }
     /**
      * Open session save handler callback.
@@ -69,10 +70,16 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
      */
     public function read($sessionId)
     {
-        $session = $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->first();
+        $session = $this->db->table('session')
+            ->where('id', '=', $sessionId)
+            ->first();
         if (!isset($session->data)) {
-            $this->db->connection($this->connection)->table('session')->insert(['id' => $sessionId, 'data' => '']);
-            $session = $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->first();
+            $this->db->table('session')
+                ->insert(['id' => $sessionId, 'data' => '']);
+            $session = $this->db->connection($this->connection)
+                ->table('session')
+                ->where('id', '=', $sessionId)
+                ->first();
         }
         return $session->data;
     }
@@ -85,7 +92,9 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
      */
     public function write($sessionId, $data)
     {
-        $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->update(['data' => $data]);
+        $this->db->table('session')
+            ->where('id', '=', $sessionId)
+            ->update(['data' => $data]);
         return true;
     }
     /**
@@ -96,7 +105,9 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
      */
     public function destroy($sessionId)
     {
-        $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->delete();
+        $this->db->table('session')
+            ->where('id', '=', $sessionId)
+            ->delete();
     }
     /**
      * Garbage collection session save handler callback.
@@ -106,7 +117,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
      */
     public function gc($lifetime)
     {
-        $this->db->connection($this->connection)->raw("DELETE FROM session WHERE updated_at < DATE_SUB(NOW(), INTERVAL :ttl SECOND)", ['ttl' => \App::config('session.life')]);
+        $this->db->raw("DELETE FROM session WHERE updated_at < DATE_SUB(NOW(), INTERVAL :ttl SECOND)", ['ttl' => \App::config('session.life')]);
     }
     /**
      * Checks if the session table exists
@@ -116,7 +127,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
      */
     protected function checkSessionTable()
     {
-        $this->db->connection($this->connection)->raw("CREATE TABLE IF NOT EXISTS `session` (
+        $this->db->raw("CREATE TABLE IF NOT EXISTS `session` (
             `id` char(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
             `created_at` timestamp NULL DEFAULT NULL,
             `updated_at` timestamp NULL DEFAULT NULL,

@@ -707,6 +707,7 @@ abstract class Database implements Rdbms
      * Converts a string of fields to array if needed.
      *
      * @param  mixed  $data
+     * @param  bool   $aggregate
      * @return array
      */
     protected function stringToArray($data, $aggregate = false)

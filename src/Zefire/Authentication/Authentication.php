@@ -28,7 +28,8 @@ class Authentication
     /**
      * Create a new Authentication instance.
      *
-     * @param. \Zefire\Factory\Factory
+     * @param  \Zefire\Factory\Factory
+     * @param  \Zefire\Event\Dispatcher
      * @return void
      */
     public function __construct(Factory $factory, Dispatcher $dispatcher)
