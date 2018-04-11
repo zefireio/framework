@@ -2,12 +2,18 @@
 
 namespace Zefire\Session;
 
-// use Zefire\Core\Serializable;
-// use Zefire\Contracts\Connectable;
+use Zefire\Core\Serializable;
+use Zefire\Contracts\Connectable;
 
-class DatabaseSessionHandler implements \SessionHandlerInterface
+class DatabaseSessionHandler implements \SessionHandlerInterface, Connectable
 {
-	// use Serializable;
+	use Serializable;
+    /**
+     * Stores a connection name.
+     *
+     * @var string
+     */
+    protected $connection;
     /**
      * Stores a DB instance.
      *
@@ -21,16 +27,19 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      */
     public function __construct()
     {
-        $this->connect();
+        $this->connection = \App::config('session.connection');
+        $this->connect($this->connection);
+        $this->checkSessionTable();
     }
     /**
      * Connect to memcache server.
      *
      * @return void
      */
-    public function connect()
+    public function connect($connection)
     {
         $this->db = \App::make('Zefire\Database\DB');
+        $this->db->connection($connection);
     }
     /**
      * Open session save handler callback.
@@ -60,10 +69,10 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        $session = $this->db->connection('mysql1')->table('session')->where('id', '=', $sessionId)->first();
+        $session = $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->first();
         if (!isset($session->data)) {
-            $this->db->insert(['id' => $sessionId, 'data' => '']);
-            $session = $this->db->connection('mysql1')->table('session')->where('id', '=', $sessionId)->first();
+            $this->db->connection($this->connection)->table('session')->insert(['id' => $sessionId, 'data' => '']);
+            $session = $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->first();
         }
         return $session->data;
     }
@@ -76,7 +85,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      */
     public function write($sessionId, $data)
     {
-        $this->db->where('id', '=', $sessionId)->update(['data' => $data]);
+        $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->update(['data' => $data]);
         return true;
     }
     /**
@@ -87,7 +96,7 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      */
     public function destroy($sessionId)
     {
-        $this->db->where('id', '=', $sessionId)->delete();
+        $this->db->connection($this->connection)->table('session')->where('id', '=', $sessionId)->delete();
     }
     /**
      * Garbage collection session save handler callback.
@@ -97,6 +106,27 @@ class DatabaseSessionHandler implements \SessionHandlerInterface
      */
     public function gc($lifetime)
     {
-        $this->db->connection('mysql1')->raw("DELETE FROM session WHERE updated_at < DATE_SUB(NOW(), INTERVAL :ttl SECOND)", ['ttl' => \App::config('session.life')]);
+        $this->db->connection($this->connection)->raw("DELETE FROM session WHERE updated_at < DATE_SUB(NOW(), INTERVAL :ttl SECOND)", ['ttl' => \App::config('session.life')]);
+    }
+    /**
+     * Checks if the session table exists
+     * and will create it if needed.
+     *
+     * @return void
+     */
+    protected function checkSessionTable()
+    {
+        $this->db->connection($this->connection)->raw("CREATE TABLE IF NOT EXISTS `session` (
+            `id` char(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+            `created_at` timestamp NULL DEFAULT NULL,
+            `updated_at` timestamp NULL DEFAULT NULL,
+            `deleted_at` timestamp NULL DEFAULT NULL,
+            `created_by` int(11) DEFAULT NULL,
+            `updated_by` int(11) DEFAULT NULL,
+            `deleted_by` int(11) DEFAULT NULL,
+            `data` longtext COLLATE utf8_unicode_ci,
+            PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
+        );
     }
 }

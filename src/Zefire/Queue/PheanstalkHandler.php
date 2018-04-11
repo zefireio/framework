@@ -30,7 +30,8 @@ class PheanstalkHandler
      */
     public function connect()
     {
-        $this->client = new Pheanstalk(\App::config('queueing.beanstalk'));
+        $config = explode(':', \App::config('queueing.beanstalk'));
+        $this->client = new Pheanstalk($config[0], $config[1]);
     }
     /**
      * Pushes a job on a queue.
@@ -107,8 +108,8 @@ class PheanstalkHandler
     {
         try {
             $args = json_decode($job->args, true);
-            $job = \Factory::make($job->name);
             \Dispatcher::now('queue-process', ['job' => $job->name]);
+            $job = \Factory::make($job->name);            
             $dependencies = \App::resolveMethodDependencies($job, 'handle');
             $dependencies = array_merge($args, $dependencies);
             call_user_func_array(array($job, 'handle'), $dependencies);

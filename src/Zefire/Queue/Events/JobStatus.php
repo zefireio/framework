@@ -32,12 +32,13 @@ class JobStatus
      */
 	public function handle($queue, $job, $status)
     {
-        if (is_object($job)) {
+        if ($job instanceOf \Pheanstalk\Job) {
             $job = json_decode($job->getData());
-        }
-        if (is_string($job)) {
+        } else if (is_object($job)) {
+            $job = json_decode($job->job);            
+        } else {
             $job = json_decode($job);
-        }        
+        }
         switch ($status) {
             case 1:
                 $this->logger->push('Successfuly processed "' . $job->name . '" from "' . $queue . '" queue ', 'queue');

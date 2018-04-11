@@ -818,7 +818,7 @@ abstract class Database implements Rdbms
     protected function execute()
     {
         $this->statement->execute();
-        $this->dispatcher->queue('db-query', ['statement' => $this->statement->queryString, 'bindings' => json_encode($this->bindings)]);
+        $this->dispatcher->now('db-query', ['statement' => $this->statement->queryString, 'bindings' => json_encode($this->bindings)]);
     }
     /**
      * Resolves a connection and returns a PDO instance.
@@ -855,7 +855,7 @@ abstract class Database implements Rdbms
                             PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION sql_mode='" . $sqlModes . "'"
                         ]
                     );
-                    $this->dispatcher->queue('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => 'sql_mode: ' . $sqlModes]);
+                    $this->dispatcher->now('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => 'sql_mode: ' . $sqlModes]);
                     break;
                 case 'pgsql':
                     if ($connection['host'] == '' || $connection['port'] == '' || $connection['database'] == '') {
@@ -867,7 +867,7 @@ abstract class Database implements Rdbms
                         $connection['username'],
                         $connection['password']
                     );
-                    $this->dispatcher->queue('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => null]);
+                    $this->dispatcher->now('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => null]);
                     break;
                 case 'sqlite':
                     $dsn = 'sqlite::memory:';
@@ -879,7 +879,7 @@ abstract class Database implements Rdbms
                             PDO::ATTR_PERSISTENT => true
                         ]
                     );
-                    $this->dispatcher->queue('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => null]);
+                    $this->dispatcher->now('db-connect', ['status' => ($pdo) ? true : false, 'dsn' => $dsn, 'options' => null]);
                     break;
             }
             return $pdo;    

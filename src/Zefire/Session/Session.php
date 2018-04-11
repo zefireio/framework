@@ -23,18 +23,20 @@ class Session implements Storable
 	public function __construct()
     {
         $this->driver = \App::make(\App::config('session.driver'));
-        session_set_save_handler(
-            array($this->driver, 'open'),
-            array($this->driver, 'close'),
-            array($this->driver, 'read'),
-            array($this->driver, 'write'),
-            array($this->driver, 'destroy'),
-            array($this->driver, 'gc')
-        );
-        if ($this->driver instanceOf \Zefire\Session\FileSessionHandler) {
-            session_save_path($this->driver->path());
-        }    
-        session_start();
+        if (!headers_sent()) {
+            session_set_save_handler(
+                array($this->driver, 'open'),
+                array($this->driver, 'close'),
+                array($this->driver, 'read'),
+                array($this->driver, 'write'),
+                array($this->driver, 'destroy'),
+                array($this->driver, 'gc')
+            );
+            if ($this->driver instanceOf \Zefire\Session\FileSessionHandler) {
+                session_save_path($this->driver->path());
+            }    
+            session_start();    
+        }        
     }
     /**
      * Returns all content from session.
@@ -53,7 +55,7 @@ class Session implements Storable
      */
 	public function get($key)
 	{
-		return Arr::get($key, $_SESSION);		
+		return Arr::get($key, $_SESSION);
 	}
 	/**
      * Checks if a value exists in session.
