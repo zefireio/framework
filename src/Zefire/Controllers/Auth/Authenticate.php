@@ -29,9 +29,9 @@ class Authenticate
      */
 	public function login(Request $request)
 	{
-		$inputs = $request->input();
+		$inputs = $request->except('X-CSRF-TOKEN');
 		$rules = [
-            'email' 	=> 'required',
+            'email' 	=> 'required|email|max:255',
             'password' 	=> 'required'
         ];
         \Validator::validate($rules, $inputs);
@@ -39,7 +39,7 @@ class Authenticate
             if (\Auth::login($inputs['email'], \Hasher::make($inputs['password']))) {
             	\Redirect::intended();
             } else {
-            	\Redirect::to('/auth/login');
+            	\Redirect::to('/login');
             }
         }
 	}

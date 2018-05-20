@@ -72,11 +72,11 @@ class Request
         }));        
     }	
     /**
-     * Retrieves inputs from request.
+     * Retrieves all inputs from request.
      *
      * @return array
      */
-	public function input()
+	public function inputs()
 	{
 		switch ($this->method()) {
 			case 'GET':
@@ -94,6 +94,47 @@ class Request
 		return $input;
 	}
 	/**
+     * Retrieves all inputs from request.
+     *
+     * @return array
+     */
+	public function all()
+	{
+		return $this->inputs();
+	}
+	/**
+     * Retrieves a specific input from request.
+     *
+     * @param  string $key
+     * @return array
+     */
+	public function input($key)
+	{
+		$array = $this->inputs();
+		return isset($array[$key]) ? $array[$key] : null;
+	}
+	/**
+     * Retrieves all inputs from request except specific keys.
+     *
+	 * @param  mixed $keys
+     * @return array
+     */
+	public function except($keys)
+	{
+		if (!is_array($keys)) {
+			$explode = explode('|', $keys);
+			$except = $explode;
+		}
+		$array = $this->inputs();
+		$data = [];
+		foreach ($array as $key => $value) {
+			if (!in_array($key, $except)) {
+				$data[$key] = $value;
+			}
+		}
+		return $data;
+	}
+	/**
      * Retrieves uploaded file from request.
      *
      * @return string
@@ -105,6 +146,7 @@ class Request
 	/**
      * Merges an array of value to existing inputs.
      *
+     * @param  array $array
      * @return void
      */
 	public function merge(array $array = [])
@@ -134,11 +176,11 @@ class Request
 	{
 		switch ($this->method()) {
 			case 'GET':
-				return ($_GET[$key]) ? 1 : 0;
+				return (isset($_GET[$key])) ? true : false;
 			case 'POST':
 			case 'PUT':
 			case 'DELETE':
-				return ($_POST[$key]) ? 1 : 0;
+				return (isset($_POST[$key])) ? true : false;
 		}
 	}
 	/**
@@ -223,7 +265,7 @@ class Request
      */
 	public function secure()
 	{
-		return ($this->server('SERVER_PORT') == 443) ? 1 : 0;
+		return ($this->server('SERVER_PORT') == 443) ? true : false;
 	}
 	/**
      * Determines if the request's was sent through AJAX.
@@ -232,7 +274,7 @@ class Request
      */
 	public function ajax()
 	{
-		return (strtolower($this->server('HTTP_X_REQUESTED_WITH')) == 'xmlhttprequest') ? 1 : 0;
+		return (strtolower($this->server('HTTP_X_REQUESTED_WITH')) == 'xmlhttprequest') ? true : false;
 	}
 	/**
      * Retrieves the request's document root.
@@ -279,7 +321,7 @@ class Request
 	public function wantsJson()
 	{
 		$explode = explode(',', $this->server('HTTP_ACCEPT'));
-		return ($explode[0] == 'application/json') ? 1 : 0;
+		return ($explode[0] == 'application/json') ? true : false;
 	}
 	/**
      * Retrieves the request's authorization token.

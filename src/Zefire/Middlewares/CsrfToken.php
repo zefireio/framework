@@ -59,9 +59,9 @@ class CsrfToken implements Middleware
      */
 	protected function getToken()
 	{
-		$inputs = $this->request->input();		
-		if (isset($inputs['X-CSRF-TOKEN']) && $inputs['X-CSRF-TOKEN'] != '') {
-			return $inputs['X-CSRF-TOKEN'];
+		$csrf = $this->request->input('X-CSRF-TOKEN');		
+		if ($csrf != null && $csrf != '') {
+			return $csrf;
 		}
 		if (($this->request->server('X-CSRF-TOKEN') != null)) {
 			return $this->request->server('X-CSRF-TOKEN');

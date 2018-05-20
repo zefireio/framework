@@ -221,7 +221,7 @@ class " . $model . " extends Model
 
     public static function boot()
     {
-        $model = get_class();
+        \$model = get_class();
         return new $model();
     }
 }";
@@ -242,8 +242,8 @@ class " . $model . " extends Model
      */
 	public function generateAuth()
 	{
-		if (!file_exists(\App::appPath() . 'Controllers/Http/Auth')) {
-			if (!mkdir(\App::appPath() . 'Controllers/Http/Auth', 0755, true)) {
+		if (!file_exists(\App::appPath() . '/Controllers/Http/Auth')) {
+			if (!mkdir(\App::appPath() . '/Controllers/Http/Auth', 0755, true)) {
     			throw new \Exception('Failed to create Auth directory');
 			}
 		}
@@ -257,7 +257,7 @@ class Authenticate extends Auth
 {
 	//	
 }";
-		\File::put(\App::appPath() . 'Controllers/Http/Auth/Authenticate.php', $string);
+		\File::put(\App::appPath() . '/Controllers/Http/Auth/Authenticate.php', $string);
 		$string = "<?php
 
 namespace App\Controllers\Http\Auth;
@@ -268,9 +268,9 @@ class Register extends Registration
 {
 	//
 }";
-		\File::put(\App::appPath() . 'Controllers/Http/Auth/Register.php', $string);
-		if (!file_exists(\App::resourcesPath() . 'templates/auth')) {
-			if (!mkdir(\App::resourcesPath() . 'templates/auth', 0755, true)) {
+		\File::put(\App::appPath() . '/Controllers/Http/Auth/Register.php', $string);
+		if (!file_exists(\App::resourcesPath() . '/templates/auth')) {
+			if (!mkdir(\App::resourcesPath() . '/templates/auth', 0755, true)) {
     			throw new \Exception('Failed to create auth directory');
 			}
 		}
@@ -292,7 +292,7 @@ class Register extends Registration
         </form>
     </div>
 @endsection";
-		\File::put(\App::resourcesPath() . 'templates/auth/login.php', $string);
+		\File::put(\App::resourcesPath() . '/templates/auth/login.php', $string);
 		$string = "@extends('layout.master')
 
 @section('content')
@@ -309,7 +309,7 @@ class Register extends Registration
         </form>
     </div>
 @endsection";
-		\File::put(\App::resourcesPath() . 'templates/auth/register.php', $string);
+		\File::put(\App::resourcesPath() . '/templates/auth/register.php', $string);
 		$string = "<?php
 
 return [
@@ -319,7 +319,7 @@ return [
 	'email' 		=> 'Email',
 	'password' 		=> 'Password',
 ];";
-		\File::put(\App::resourcesPath() . 'lang/en/auth.php', $string);
+		\File::put(\App::resourcesPath() . '/lang/en/auth.php', $string);
 		return 'Authentication controllers have been created.';
 	}
 	/**

@@ -30,20 +30,20 @@ class Registration
      */
 	public function register(Request $request)
 	{
-		$inputs = $request->input();
+		$inputs = $request->except('X-CSRF-TOKEN');
         $rules = [
             'email' 	=> 'required|unique:user|email|max:255',
-            'password' 	=> 'min:6'
+            'password' 	=> 'required|min:6'
         ];
         \Validator::validate($rules, $inputs);
         if (\Validator::passes()) {
         	$inputs['password'] = \Hasher::make($inputs['password']);
-        	$model = new User();
+            $model = new User();
             $user = $model->create($inputs);
             if (\Auth::login($user->email, $user->password)) {
             	\Redirect::to($this->redirect);
             } else {
-            	\Redirect::to('/auth/register');
+            	\Redirect::to('/register');
             }
         }
 	}
