@@ -242,7 +242,7 @@ abstract class Model extends Database implements Modelisable
         $select = $this->select;
         $count = $this->count();
         $this->select = $select;
-        $inputs = (\Request::method() =='GET') ? \Request::input() : $inputs = [];
+        $inputs = (\Request::method() =='GET') ? \Request::inputs() : $inputs = [];
         $current = (isset($inputs['page']) && $inputs['page'] != '') ? $inputs['page'] : 1;
         $pages = $count / $perPage;
         $this->limit = $perPage;
