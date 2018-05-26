@@ -32,7 +32,7 @@ class Authorization implements Middleware
 	{
 		if (!\Auth::status()) {
 			\Redirect::setIntended($this->request->uri());
-			\Redirect::to('/auth/login');
+			\Redirect::to('/login');
 		}		
 	}
 }
