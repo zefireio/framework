@@ -51,6 +51,6 @@ class Authenticate
 	public function logout()
 	{
 		\Auth::logout();
-		\Redirect::to('/);
+		\Redirect::to('/');
 	}
 }
