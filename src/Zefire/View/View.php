@@ -85,14 +85,12 @@ class View
 		$this->data = $data;
           $this->getTemplate($template);
 		$this->generateId();
-		if (\App::config('view.force_compile') === true) {
+		if (\App::config('view.force_compile')) {
 			$this->compiled = $this->compiler->make($this->template, $data);
 			$this->engine->put($this->id, $this->compiled);
-		} else {
-			if ($this->engine->expired($this->id)) {
-				$this->compiled = $this->compiler->make($this->template, $data);
-				$this->engine->put($this->id, $this->compiled);
-			}	
+		} elseif ($this->engine->expired($this->id)) {
+			$this->compiled = $this->compiler->make($this->template, $data);
+			$this->engine->put($this->id, $this->compiled);	
 		}		
 		$obLevel = ob_get_level();
 		ob_start();
